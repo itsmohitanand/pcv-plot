@@ -30,6 +30,9 @@ for fname in file_list
 
     ## Start plot
 
+    n = [35, 36, 37, 38, 37, 36, 35]
+    ci = 2 ./ sqrt.(n)
+
     f = Figure(resolution=(1400,1000))
     ax11 = Axis(f[1,1], xlabel = "Temperature Anomalies", ylabel = "Precipitation Anomalies", xgridvisible = false, ygridvisible = false)
     ax12 = Axis(f[1,2], xlabel = "Temperature Anomalies", ylabel = "Soil Moisture Anomalies", xgridvisible = false, ygridvisible = false)
@@ -49,19 +52,20 @@ for fname in file_list
 
     joint_limits = (0, maximum([maximum(a_t2m_sm), maximum(a_tp_sm)]))
 
-    sc11 = scatter!(ax11, t2m, tp, markersize = 4, color = a_t2m_sm, colorrange = joint_limits)
-    sc12 = scatter!(ax12, t2m, sm, markersize = 4, color = a_t2m_sm, colorrange = joint_limits)
-    sc13 = scatter!(ax13, sm, tp, markersize = 4, color = a_t2m_sm, colorrange = joint_limits)
-    Colorbar(f[1,4], sc11)
-    sc21 = scatter!(ax21, t2m, tp, markersize = 4, color = a_tp_sm, colorrange = joint_limits)
-    sc22 = scatter!(ax22, t2m, sm, markersize = 4, color = a_tp_sm, colorrange = joint_limits)
-    sc23 = scatter!(ax23, sm, tp, markersize = 4, color = a_tp_sm, colorrange = joint_limits)
-    Colorbar(f[2,4], sc11)
+    ms = 2
+    sc11 = scatter!(ax11, t2m, tp, markersize = ms, color = a_t2m_sm, colorrange = joint_limits)
+    sc12 = scatter!(ax12, t2m, sm, markersize = ms, color = a_t2m_sm, colorrange = joint_limits)
+    sc13 = scatter!(ax13, sm, tp, markersize = ms, color = a_t2m_sm, colorrange = joint_limits)
+    Colorbar(f[1,4], sc11, label="Attention | t2m > sm")
+    sc21 = scatter!(ax21, t2m, tp, markersize = ms, color = a_tp_sm, colorrange = joint_limits)
+    sc22 = scatter!(ax22, t2m, sm, markersize = ms, color = a_tp_sm, colorrange = joint_limits)
+    sc23 = scatter!(ax23, sm, tp, markersize = ms, color = a_tp_sm, colorrange = joint_limits)
+    Colorbar(f[2,4], sc11, label="Attention | tp > sm")
     f
     year_min = minimum(year)
     year_max = maximum(year)
 
-    lags=[-5:5;]
+    lags=[-3:3;]
 
 
     ax31= Axis(f[3,1:2], xgridvisible = false, ygridvisible = false, xlabel = "Attention | t2m > sm")
@@ -80,7 +84,7 @@ for fname in file_list
     ax31x = Axis(f[3, 1:2], yaxisposition = :right, xgridvisible = false, ygridvisible = false)
     index = year_max .>= year_oni .>= year_min
 
-    lines!(ax31x, year_oni[index], oni[index])
+    lines!(ax31x, year_oni[index], oni[index] , color = palette[20])
     hidespines!(ax31, :r, :t)
     hidespines!(ax31x, :l, :t)
     xlims!(ax31, (year_min , year_max))
@@ -91,7 +95,10 @@ for fname in file_list
     r = crosscor(Float64.(yearly_attn_t2m_sm), oni[index], lags; demean=true)
     ax32 = Axis(f[3,3:4], xlabel = "Correlation | t2m > sm", xgridvisible = false, ygridvisible = false)
     stem!(ax32, lags, r )
-    ylims!(ax32, (-0.5, 0.5))
+    lines!(ax32, lags, ci, color = "red", linestyle = "--")
+    lines!(ax32, lags, -ci, color = "red", linestyle = "--")
+    xlims!(ax32, (-3.2, 3.2))
+    ylims!(ax32, (-0.6, 0.6))
     f
 
     ax41= Axis(f[4,1:2], xgridvisible = false, ygridvisible = false, xlabel = "Attention | tp > sm")
@@ -111,19 +118,24 @@ for fname in file_list
     index = year_max .>= year_oni .>= year_min
     year_oni[index]
 
-    lines!(ax41x, year_oni[index], oni[index])
+    lines!(ax41x, year_oni[index], oni[index] , color = palette[20])
     hidespines!(ax41, :r, :t)
     hidespines!(ax41x, :l, :t)
 
     xlims!(ax41, (year_min , year_max))
     xlims!(ax41x, (year_min , year_max))
 
-
     r = crosscor(Float64.(yearly_attn_tp_sm), oni[index], lags; demean=true)
     ax42 = Axis(f[4,3:4], xlabel = "Correlation | tp > sm", xgridvisible = false, ygridvisible = false)
     stem!(ax42, lags, r)
-    ylims!(ax42, (-0.5, 0.5))
+    lines!(ax42, lags, ci, color = "red", linestyle = "--")
+    lines!(ax42, lags, -ci, color = "red", linestyle = "--")
+    xlims!(ax42, (-3.2, 3.2))
+    ylims!(ax42, (-0.6, 0.6))
 
     save_path = collect(eachsplit(fname, "/"))[end][1:end-10]
     save("/Users/anand/Documents/data/pcv/images/"*save_path*".pdf", f)
 end
+
+
+
