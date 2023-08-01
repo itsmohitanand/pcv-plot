@@ -1,141 +1,91 @@
-using CairoMakie
-using Colors
-using ColorSchemes
-using CSV
+using GeoMakie, CairoMakie
+using Shapefile
 using DataFrames
+using Makie.GeometryBasics
+using CSV
 using Statistics
-using StatsBase
+using NPZ
 
-
-file_list = readdir("/Users/anand/Documents/data/pcv/attention")
-
-## Viridis Color 
-palette = ColorSchemes.viridis.colors
 
 include("core.jl")
 
-oni_data = Matrix(CSV.read("/Users/anand/Documents/data/pcv/oni.csv", DataFrame, delim = "\t"))
-year_oni = oni_data[:, 1]
-oni = mean(oni_data[:, 2:end], dims=2)[:,1]
+path = "/Users/anand/Documents/data/pcv/IPCC-WGI-reference-regions-v4_shapefile/IPCC-WGI-reference-regions-v4.shp"
 
-for fname in file_list
-    print(fname*"\n")
-    a_others, year, y_true, data, ei_others = read_data("/Users/anand/Documents/data/pcv/attention/"*fname)
+table = Shapefile.Table(path)
 
-    a_t2m_sm = a_others[1, :]
-    a_tp_sm = a_others[2,:]
-    t2m = data[1,:]
-    tp = data[2,:]
-    sm = data[3,:]
+function plot_significance(ax, table, vegetation_type, xtreme)
 
-    ## Start plot
+    crop_location, forest_location = crop_forest_location()
 
-    n = [35, 36, 37, 38, 37, 36, 35]
-    ci = 2 ./ sqrt.(n)
+    if vegetation_type == "crop"
+        color = ("grey", 0.2)
+        veg_location = crop_location
+    else
+        color = ("grey", 0.2)
+        veg_location = forest_location
+    end      
+    
+    scatter!(ax, veg_location , markersize = 2.5, color = color)
 
-    f = Figure(resolution=(1400,1000))
-    ax11 = Axis(f[1,1], xlabel = "Temperature Anomalies", ylabel = "Precipitation Anomalies", xgridvisible = false, ygridvisible = false)
-    ax12 = Axis(f[1,2], xlabel = "Temperature Anomalies", ylabel = "Soil Moisture Anomalies", xgridvisible = false, ygridvisible = false)
-    ax13 = Axis(f[1,3], xlabel = "Soil Moisture Anomalies", ylabel = "Precipitation Anomalies", xgridvisible = false, ygridvisible = false)
+    
+    ipcc_regions = ipcc_region()
 
-    ax21 = Axis(f[2,1], xlabel = "Temperature Anomalies", ylabel = "Precipitation Anomalies", xgridvisible = false, ygridvisible = false)
-    ax22 = Axis(f[2,2], xlabel = "Temperature Anomalies", ylabel = "Soil Moisture Anomalies", xgridvisible = false, ygridvisible = false)
-    ax23 = Axis(f[2,3], xlabel = "Soil Moisture Anomalies", ylabel = "Precipitation Anomalies", xgridvisible = false, ygridvisible = false)
+    for i=1:length(table.geometry)
+        list_points = Point2f[]
+        if table.Name[i] in ipcc_regions
+            
+            ds_path = "/Users/anand/Documents/data/pcv/$(vegetation_type)_data/$(xtreme)"
+            fname = [path for path in readdir(ds_path) if occursin("logreg_$(xtreme)_$(vegetation_type)_$(table.Name[i])",path)]
+            fname_w = [path for path in readdir(ds_path) if occursin("logreg_winter_$(xtreme)_$(vegetation_type)_$(table.Name[i])",path)]
 
-    hidespines!(ax11, :r, :t)
-    hidespines!(ax12, :r, :t)
-    hidespines!(ax13, :r, :t)
-
-    hidespines!(ax21, :r, :t)
-    hidespines!(ax22, :r, :t)
-    hidespines!(ax23, :r, :t)
-
-    joint_limits = (0, maximum([maximum(a_t2m_sm), maximum(a_tp_sm)]))
-
-    ms = 2
-    sc11 = scatter!(ax11, t2m, tp, markersize = ms, color = a_t2m_sm, colorrange = joint_limits)
-    sc12 = scatter!(ax12, t2m, sm, markersize = ms, color = a_t2m_sm, colorrange = joint_limits)
-    sc13 = scatter!(ax13, sm, tp, markersize = ms, color = a_t2m_sm, colorrange = joint_limits)
-    Colorbar(f[1,4], sc11, label="Attention | t2m > sm")
-    sc21 = scatter!(ax21, t2m, tp, markersize = ms, color = a_tp_sm, colorrange = joint_limits)
-    sc22 = scatter!(ax22, t2m, sm, markersize = ms, color = a_tp_sm, colorrange = joint_limits)
-    sc23 = scatter!(ax23, sm, tp, markersize = ms, color = a_tp_sm, colorrange = joint_limits)
-    Colorbar(f[2,4], sc11, label="Attention | tp > sm")
-    f
-    year_min = minimum(year)
-    year_max = maximum(year)
-
-    lags=[-3:3;]
-
-
-    ax31= Axis(f[3,1:2], xgridvisible = false, ygridvisible = false, xlabel = "Attention | t2m > sm")
-
-    yearly_attn_t2m_sm = []
-    for i=year_min:year_max
-        index = i .== year 
-        year_attn = a_t2m_sm[index]
+            if !isempty(fname)
+            
+                fname = fname[1]
+                fname_w = fname_w[1]
+                
+                df = DataFrame(CSV.File(joinpath(ds_path, fname), header=1, delim="\t"))
+                df_w = DataFrame(CSV.File(joinpath(ds_path, fname_w), header=1, delim="\t"))
+                
+                sig = winter_significance(df, df_w)
         
-        x = ones(Int8, size(year_attn)) .+ i
-        boxplot!(ax31, x, year_attn, color = palette[end-15], show_outliers = false )
+                if sig
+                    if vegetation_type == "crop"
+                        color = ("yellow", 0.3)
+                    else
+                        color = ("green", 0.3)
+                    end                
+                else
+                    color = ("grey", 0.3)
+                end
+                
+                for point in table.geometry[i].points
+                    p = (point.x, point.y)
 
-        append!(yearly_attn_t2m_sm, mean(year_attn))
+                    push!(list_points, p)
+                    
+                end
+                hm = poly!(ax, list_points, color = color, colormap=:viridis, strokecolor = :black, strokewidth=1)
+            end
+        end
+
     end
 
-    ax31x = Axis(f[3, 1:2], yaxisposition = :right, xgridvisible = false, ygridvisible = false)
-    index = year_max .>= year_oni .>= year_min
-
-    lines!(ax31x, year_oni[index], oni[index] , color = palette[20])
-    hidespines!(ax31, :r, :t)
-    hidespines!(ax31x, :l, :t)
-    xlims!(ax31, (year_min , year_max))
-    xlims!(ax31x, (year_min , year_max))
-
-
-
-    r = crosscor(Float64.(yearly_attn_t2m_sm), oni[index], lags; demean=true)
-    ax32 = Axis(f[3,3:4], xlabel = "Correlation | t2m > sm", xgridvisible = false, ygridvisible = false)
-    stem!(ax32, lags, r )
-    lines!(ax32, lags, ci, color = "red", linestyle = "--")
-    lines!(ax32, lags, -ci, color = "red", linestyle = "--")
-    xlims!(ax32, (-3.2, 3.2))
-    ylims!(ax32, (-0.6, 0.6))
-    f
-
-    ax41= Axis(f[4,1:2], xgridvisible = false, ygridvisible = false, xlabel = "Attention | tp > sm")
-
-    yearly_attn_tp_sm = []
-    for i=year_min:year_max
-        index = i .== year 
-        year_attn = a_tp_sm[index]
-        
-        x = ones(Int8, size(year_attn)) .+ i
-        boxplot!(ax41, x, year_attn, color = palette[end-15], show_outliers = false )
-        append!(yearly_attn_tp_sm, mean(year_attn))
-    end
-    f
-
-    ax41x = Axis(f[4, 1:2], yaxisposition = :right, xgridvisible = false, ygridvisible = false)
-    index = year_max .>= year_oni .>= year_min
-    year_oni[index]
-
-    lines!(ax41x, year_oni[index], oni[index] , color = palette[20])
-    hidespines!(ax41, :r, :t)
-    hidespines!(ax41x, :l, :t)
-
-    xlims!(ax41, (year_min , year_max))
-    xlims!(ax41x, (year_min , year_max))
-
-    r = crosscor(Float64.(yearly_attn_tp_sm), oni[index], lags; demean=true)
-    ax42 = Axis(f[4,3:4], xlabel = "Correlation | tp > sm", xgridvisible = false, ygridvisible = false)
-    stem!(ax42, lags, r)
-    lines!(ax42, lags, ci, color = "red", linestyle = "--")
-    lines!(ax42, lags, -ci, color = "red", linestyle = "--")
-    xlims!(ax42, (-3.2, 3.2))
-    ylims!(ax42, (-0.6, 0.6))
-
-    save_path = collect(eachsplit(fname, "/"))[end][1:end-10]
-    save("/Users/anand/Documents/data/pcv/images/"*save_path*".pdf", f)
 end
 
 
+fig = Figure(resolution=(1200,1000))
+
+ax1 = GeoAxis(fig[1,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "Low crop activity" )
+ax2 = GeoAxis(fig[2,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "Low forest activity"  )
+ax3 = GeoAxis(fig[3,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "High crop activity"  )
+ax4 = GeoAxis(fig[4,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "High forest activity"  )
+
+
+plot_significance(ax1, table, "crop", "low")
+plot_significance(ax2, table, "forest", "low")
+plot_significance(ax3, table, "crop", "high")
+plot_significance(ax4, table, "forest", "high")
+
+fig
+save("images/significance_plot.pdf", fig)
 

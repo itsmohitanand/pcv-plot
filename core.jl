@@ -1,25 +1,58 @@
-using HDF5
 
-function read_data(fname)
-    fid = h5open(fname, "r")
-    a_others = fid["a_others"][:,:]
-    a_self = fid["a_self"][:,:]
-    ei_others = fid["ei_others"][:,:,:]
-    ei_self = fid["ei_self"][:,:,:]
-    y_true = fid["y_true"][:]
-    year = fid["year"][1,:]
-    data = fid["data"][1,:,:]
+function ipcc_region()
+    data_path = "/Users/anand/Documents/data/pcv/crop_data/high/"
+    region_1 = Set([split(path, "_")[2] for path in readdir(data_path) if !occursin("logreg",path)])
+    data_path = "/Users/anand/Documents/data/pcv/forest_data/high/"
+    region_2 = Set([split(path, "_")[2] for path in readdir(data_path) if !occursin("logreg",path)])
+    regions = union(region_1, region_2)
+    return collect(regions)
+end 
 
-    return a_others, year, y_true, data, ei_others
+function crop_forest_location()
+
+    crop_mask = transpose(npzread("/Users/anand/Documents/data/pcv/crop_data/crop_mask.npy"))
+    forest_mask = transpose(npzread("/Users/anand/Documents/data/pcv/forest_data/forest_mask.npy"))
+
+    lon = [-179.75:0.25:180;]
+    lat = [25:0.25:74.25;]
+
+    c = Point2f[]
+    f = Point2f[]
+
+    for i=1:1440
+        for j=1:200
+            
+            if crop_mask[i, j] == true
+                push!(c, Point2f(lon[i], lat[j]))  
+            end
+
+            if forest_mask[i, j] == true
+                push!(f, Point2f(lon[i], lat[j]))                
+            end
+
+        end
+    end
+    return c, f
 end
 
-# readdir("/Users/anand/Documents/data/pcv/attention/")
-# file_list = []
+function read_logreg_df(vegetation_type, xtreme, region_name)
 
-# function get_file_paths(xtreme, vegetation_type):
-    
-#     file_list = []
-#     for files in readdir("/Users/anand/Documents/data/pcv/attention/")
-#         if 
-#     end
-# end
+    ds_path = "/Users/anand/Documents/data/pcv/$(vegetation_type)_data/$(xtreme)"
+    fname = [path for path in readdir(ds_path) if occursin("logreg_$(xtreme)_$(vegetation_type)_$(region_name)",path)]
+    fname_w = [path for path in readdir(ds_path) if occursin("logreg_winter_$(xtreme)_$(vegetation_type)_$(region_name)",path)]
+
+    if !isempty(fname)
+        df = DataFrame(CSV.File(joinpath(ds_path, fname[1]), header=1, delim="\t"))
+        df_w = DataFrame(CSV.File(joinpath(ds_path, fname_w[1]), header=1, delim="\t"))
+
+        return df, df_w
+    else
+        return missing, missing
+    end
+end
+
+function winter_significance(df, df_w)
+    diff = max(mean(df_w[!,"AUC"]) - quantile(df[!,"AUC"], 0.9),0)
+
+    return diff>0
+end
