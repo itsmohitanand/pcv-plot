@@ -6,6 +6,9 @@ using CSV
 using Statistics
 using NPZ
 
+using ColorSchemes
+
+palette = ColorSchemes.colorschemes[:mk_12]
 
 include("core.jl")
 
@@ -18,10 +21,10 @@ function plot_significance(ax, table, vegetation_type, xtreme)
     crop_location, forest_location = crop_forest_location()
 
     if vegetation_type == "crop"
-        color = ("grey", 0.2)
+        color = :grey80
         veg_location = crop_location
     else
-        color = ("grey", 0.2)
+        color = :grey80
         veg_location = forest_location
     end      
     
@@ -50,12 +53,12 @@ function plot_significance(ax, table, vegetation_type, xtreme)
         
                 if sig
                     if vegetation_type == "crop"
-                        color = ("yellow", 0.3)
+                        color = (palette[12], 0.3)
                     else
-                        color = ("green", 0.3)
+                        color = (palette[2], 0.3)
                     end                
                 else
-                    color = ("grey", 0.3)
+                    color = (:grey80, 0.3)
                 end
                 
                 for point in table.geometry[i].points
@@ -75,10 +78,10 @@ end
 
 fig = Figure(resolution=(1200,1000))
 
-ax1 = GeoAxis(fig[1,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "Low crop activity" )
-ax2 = GeoAxis(fig[2,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "Low forest activity"  )
-ax3 = GeoAxis(fig[3,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "High crop activity"  )
-ax4 = GeoAxis(fig[4,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "High forest activity"  )
+ax1 = GeoAxis(fig[2,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "Low crop activity" )
+ax2 = GeoAxis(fig[3,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "Low forest activity"  )
+ax3 = GeoAxis(fig[4,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "High crop activity"  )
+ax4 = GeoAxis(fig[5,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "High forest activity"  )
 
 
 plot_significance(ax1, table, "crop", "low")
@@ -86,6 +89,15 @@ plot_significance(ax2, table, "forest", "low")
 plot_significance(ax3, table, "crop", "high")
 plot_significance(ax4, table, "forest", "high")
 
+elem_1 = MarkerElement(color = :grey80, marker= :circle, markersize = 10, points=Point2f[(0.5,0.5)])
+elem_2 = [PolyElement(color = (palette[12], 0.3), strokecolor = :black, strokewidth = 1, points = Point2f[(0, 0), (0, 1), (1,1), (1, 0)] )]
+elem_3 = [PolyElement(color = (palette[2], 0.3), strokecolor = :black, strokewidth = 1, points = Point2f[(0, 0), (0, 1), (1,1), (1, 0)])]
+elem_4 = [PolyElement(color = (:grey80, 0.3), strokecolor = :black, strokewidth = 1, points = Point2f[(0, 0), (0, 1), (1,1), (1, 0)])]
+
+Legend(fig[1,1:end], [elem_1, elem_2, elem_3, elem_4], ["Vegetation", "Significant winter (Crop)", "Significant winter (Forest)", "Other Region"], orientation= :horizontal)
+
 fig
+
+
 save("images/significance_plot.pdf", fig)
 
