@@ -52,8 +52,8 @@ ax2 = Axis(f[2,2], title = "High vegetation activity", xgridvisible = false, ygr
 # ax3 = Axis(f[2,1], title = "High crop activity", xgridvisible = false, ygridvisible=false, yticks= (1:1:19*1, regions))
 # ax4 = Axis(f[2,2], title = "High forest activity", xgridvisible = false, ygridvisible=false)
 
-ylims!(ax1, (0,20))
-ylims!(ax2, (0,20))
+ylims!(ax1, (0.5,19.5))
+ylims!(ax2, (0.5,19.5))
 # ylims!(ax3, (1,20))
 # ylims!(ax4, (1,20))
 
@@ -77,4 +77,5 @@ elem_2 = MarkerElement(color = palette["mint"], marker = :rect, markersize = 15,
 
 Legend(f[1,1:end], [elem_1, elem_2], ["Crop", "Forest"], orientation= :horizontal)
 f
+
 save("images/year_of_extreme.pdf", f)

@@ -104,4 +104,26 @@ index_significant = Dict(
     "Russian-Far-East" => 10,
     "W.Siberia" => 11,
     "W.C.Asia" => 12,
-)    
+)
+
+ipcc_acronym = Dict(
+    "C.North-America" => "CNA",
+ "E.Asia" => "EAS",
+ "E.C.Asia" => "ECA",
+ "E.Europe" => "EEU",
+ "E.North-America" => "ENA",
+ "E.Siberia" => "ESB",
+ "Mediterranean" => "MED",
+ "N.Central-America" => "NCA",
+ "N.E.North-America" => "NEN",
+ "N.Europe" => "NEU",
+ "N.W.North-America" => "NWN",
+ "Russian-Arctic" => "RAR",
+ "Russian-Far-East" => "RFE",
+ "S.Asia" => "SAS",
+ "Tibetan-Plateau" => "TIB",
+ "W.C.Asia" => "WCA",
+ "W.North-America" => "WNA",
+ "W.Siberia" => "WSB",
+ "West&Central-Europe" => "WCE",
+)
