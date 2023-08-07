@@ -8,7 +8,6 @@ using GLM
 using Random
 using EvalMetrics
 
-palette = ColorSchemes.colorschemes[:mk_12]
 
 include("core.jl")
 
@@ -48,7 +47,7 @@ for i=1:100
     target = test[!, "lai_su"]
 
     roc = roccurve(target, scores)
-    lines!(ax1, roc[1], roc[2], color=palette[6])
+    lines!(ax1, roc[1], roc[2], color=palette["light_cyan"])
 
     push!(auc_w_list, auc_trapezoidal(roccurve(target, scores)...))
 
@@ -61,16 +60,16 @@ for i=1:100
     roc = roccurve(target, scores)
     push!(auc_list, auc_trapezoidal(roc...))
 
-    lines!(ax1, roc[1], roc[2], color=:grey80)
+    lines!(ax1, roc[1], roc[2], color=palette["pale_grey"])
 
 end
 f
 
-hist!(ax2, auc_list, color = :grey80)
-hist!(ax2, auc_w_list, color = palette[6])
+hist!(ax2, auc_list, color = palette["pale_grey"])
+hist!(ax2, auc_w_list, color = palette["light_cyan"])
 
 vlines!(ax2, quantile(auc_list, 0.9), color = :black, linestyle = "--" )
 vlines!(ax2, mean(auc_w_list), color = :black )
-
+f
 save("images/method.pdf", f)
 

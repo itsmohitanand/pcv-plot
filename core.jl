@@ -4,14 +4,14 @@ function ipcc_region()
     region_1 = Set([split(path, "_")[2] for path in readdir(data_path) if !occursin("logreg",path)])
     data_path = "/Users/anand/Documents/data/pcv/forest_data/high/"
     region_2 = Set([split(path, "_")[2] for path in readdir(data_path) if !occursin("logreg",path)])
-    regions = union(region_1, region_2)
+    regions = delete!(union(region_1, region_2),"Sahara")
     return sort(collect(regions))
 end 
 
 function crop_forest_location()
 
-    crop_mask = transpose(npzread("/Users/anand/Documents/data/pcv/crop_data/crop_mask.npy"))
-    forest_mask = transpose(npzread("/Users/anand/Documents/data/pcv/forest_data/forest_mask.npy"))
+    crop_mask = transpose(npzread("/Users/anand/Documents/data/pcv/crop_data/crop_mask_v2.npy"))
+    forest_mask = transpose(npzread("/Users/anand/Documents/data/pcv/forest_data/forest_mask_v2.npy"))
 
     lon = [-179.75:0.25:180;]
     lat = [25:0.25:74.25;]
@@ -78,3 +78,30 @@ end
 function winter_climate_anomaly(df)
     return anomaly(df, "t2m_winter"), anomaly(df, "tp_winter")
 end
+
+palette = Dict(    
+    "light_blue"=> "#77AADD",
+    "light_cyan"=> "#99DDFF",
+    "mint" =>  "#44BB99",
+    "pear" =>  "#BBCC33",
+    "olive" =>  "#AAAA00",
+    "light_yellow" =>  "#EEDD88",
+    "orange" =>  "#EE8866",
+    "pink" =>  "#FFAABB",
+    "pale_grey" =>  "#DDDDDD",
+    )
+
+index_significant = Dict(
+    "C.North-America" => 1,
+    "E.Asia" => 2,
+    "E.C.Asia" => 3,
+    "E.Siberia" => 4,
+    "E.Europe" => 5,
+    "E.North-America" => 6,
+    "Mediterranean" => 7,
+    "N.E.North-America" => 8,
+    "Russian-Arctic" => 9,
+    "Russian-Far-East" => 10,
+    "W.Siberia" => 11,
+    "W.C.Asia" => 12,
+)    

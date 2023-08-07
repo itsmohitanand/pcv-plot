@@ -29,9 +29,9 @@ function coefficient_boxplot(ax, vegetation_type, xtreme)
 
             if winter_significance(df, df_w)
                 if vegetation_type == "crop"
-                    color = (palette[12])
+                    color = (palette["orange"])
                 else
-                    color = (palette[2])
+                    color = (palette["mint"])
                 end
             end
 
@@ -47,7 +47,7 @@ end
 
 function plot_anomalies(ax, vegetation_type, xtreme)
 
-    for region in region_list
+    for region in ipcc_regions
         if vegetation_type == "crop"
             marker = :diamond
         else
@@ -61,9 +61,9 @@ function plot_anomalies(ax, vegetation_type, xtreme)
         if !ismissing(df_w)
             if winter_significance(df, df_w)
                 if vegetation_type == "crop"
-                    color = (palette[12])
+                    color = (palette["orange"])
                 else
-                    color = (palette[2])
+                    color = (palette["mint"])
                 end
             end
             
@@ -104,10 +104,10 @@ plot_anomalies(ax4, "forest", "high")
 # hidespines!(ax2, :r, :t)
 
 f
-elem_1 = MarkerElement(color = :grey80, marker = :star4, markersize = 15, points=Point2f[(0.5,0.5)])
-elem_2 = MarkerElement(color = :grey80, marker = :diamond, markersize = 15, points=Point2f[(0.5,0.5)])
-elem_3 = MarkerElement(color = palette[12], marker = :star4, markersize = 15, points=Point2f[(0.5,0.5) ])
-elem_4 = MarkerElement(color = palette[2], marker = :diamond, markersize = 15, points=Point2f[(0.5,0.5)])
+elem_1 = MarkerElement(color = :grey80, marker = :diamond, markersize = 15, points=Point2f[(0.5,0.5)])
+elem_2 = MarkerElement(color = :grey80, marker = :star4, markersize = 15, points=Point2f[(0.5,0.5)])
+elem_3 = MarkerElement(color = palette["orange"], marker = :diamond, markersize = 15, points=Point2f[(0.5,0.5) ])
+elem_4 = MarkerElement(color = palette["mint"], marker = :star4, markersize = 15, points=Point2f[(0.5,0.5)])
 
 Legend(f[1,1:2], [elem_1, elem_2, elem_3, elem_4], ["Crop Region", "Forest Region", "Significant winter (Crop)", "Significant winter (Forest)"], orientation= :horizontal)
 
