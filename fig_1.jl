@@ -8,8 +8,6 @@ using NPZ
 
 using ColorSchemes
 
-
-
 include("core.jl")
 
 path = "/Users/anand/Documents/data/pcv/IPCC-WGI-reference-regions-v4_shapefile/IPCC-WGI-reference-regions-v4.shp"
@@ -52,6 +50,7 @@ function plot_significance(ax, table, vegetation_type, xtreme)
                 sig = winter_significance(df, df_w)
         
                 if sig
+                    println(table.Name[i])
                     if vegetation_type == "crop"
                         color = (palette["orange"], 0.3)
                     else
@@ -78,10 +77,10 @@ end
 
 fig = Figure(resolution=(1200,1000))
 
-ax1 = GeoAxis(fig[2,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "Low crop activity" )
-ax2 = GeoAxis(fig[3,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "Low forest activity"  )
-ax3 = GeoAxis(fig[4,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "High crop activity"  )
-ax4 = GeoAxis(fig[5,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "High forest activity"  )
+ax1 = GeoAxis(fig[2,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "Low crop activity", xticklabelsvisible=false, yticklabelsvisible=false, yticks=[0,90], xticks=[-180,180] )
+ax2 = GeoAxis(fig[3,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "Low forest activity", xticklabelsvisible=false, yticklabelsvisible=false, yticks=[0,90], xticks=[-180,180]   )
+ax3 = GeoAxis(fig[4,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "High crop activity", xticklabelsvisible=false, yticklabelsvisible=false, yticks=[0,90], xticks=[-180,180]   )
+ax4 = GeoAxis(fig[5,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "High forest activity", xticklabelsvisible=false, yticklabelsvisible=false, yticks=[0,90], xticks=[-180,180]   )
 
 
 plot_significance(ax1, table, "crop", "low")
