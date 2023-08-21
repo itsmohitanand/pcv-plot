@@ -26,27 +26,42 @@ function standard_norm(df)
     return df    
 end
 
-function plot_anomaly!(vegetation_type, xtreme, region, ax1, ax2, ax3)
+function plot_anomaly!(vegetation_type, xtreme, region, ax1, ax2, ax3, ax4)
     df = read_ori_data(vegetation_type, xtreme, region)
-    if vegetation_type == "crop"
+    
+    if xtreme == "high"
         val = [10,20,30]
-        color = palette["orange"]
-    elseif vegetation_type == "forest"
+        color = palette["light_yellow"]
+    elseif xtreme == "low"
         val = [12,22,32]
-        color = palette["mint"]
+        color = palette["pink"]
     end
 
+
+    # if vegetation_type == "crop"
+    #     val = [10,20,30]
+    #     color = palette["orange"]
+    # elseif vegetation_type == "forest"
+    #     val = [12,22,32]
+    #     color = palette["mint"]
+    # end
+
     if !ismissing(df)
-        print(size(df))
+        n_init = size(df)[1]
         df = filter(row -> all(!isnan, row), df)
+        n_final = size(df)[1]
+
         df = standard_norm(df)
-        print(size(df))
+
+        δ = (n_init-n_final)*100/n_init
+        println(size(df)[1])
+        println(round(δ, digits = 2))
     
         df = df[df[!, "lai_su"].==1, :]
-        print(size(df))
         t2m = zeros(3,size(df)[1])
         tp = zeros(3,size(df)[1])
         sm = zeros(3,size(df)[1])
+        lai = zeros(3,size(df)[1])
         
         t2m[1, :] = df[!, "t2m_winter"]
         t2m[2, :] = df[!, "t2m_spring"]
@@ -60,35 +75,54 @@ function plot_anomaly!(vegetation_type, xtreme, region, ax1, ax2, ax3)
         sm[2, :] = df[!, "sm_spring"]
         sm[3, :] = df[!, "sm_summer"]
 
-        boxplot!(ax1, val[1] .+ zeros(size(t2m)[2]),  t2m[1, :], show_outliers=false, color = color, show_notch=true)
+        lai[2, :] = df[!, "lai_spring"]
+        lai[3, :] = df[!, "lai_su"]
+
+
+        boxplot!(ax1, val[1] .+ zeros(size(t2m)[2]),  t2m[1, :], show_outliers=false, color = color, show_notch=true, label=xtreme)
         boxplot!(ax1, val[2] .+ zeros(size(t2m)[2]),  t2m[2, :], show_outliers=false, color = color, show_notch=true)
         boxplot!(ax1, val[3] .+ zeros(size(t2m)[2]),  t2m[3, :], show_outliers=false, color = color, show_notch=true)
         hlines!(ax1, 0, linestyle = "--", color = "black")
         
-        boxplot!(ax2, val[1] .+ zeros(size(tp)[2]),  tp[1, :], show_outliers=false, color = color, show_notch=true)
+        boxplot!(ax2, val[1] .+ zeros(size(tp)[2]),  tp[1, :], show_outliers=false, color = color, show_notch=true, label=xtreme)
         boxplot!(ax2, val[2] .+ zeros(size(tp)[2]),  tp[2, :], show_outliers=false, color = color, show_notch=true)
         boxplot!(ax2, val[3] .+ zeros(size(tp)[2]),  tp[3, :], show_outliers=false, color = color, show_notch=true)
         hlines!(ax2, 0, linestyle = "--", color = "black")
 
-        boxplot!(ax3, val[1] .+ zeros(size(sm)[2]),  sm[1, :], show_outliers=false, color = color, show_notch=true)
+        boxplot!(ax3, val[1] .+ zeros(size(sm)[2]),  sm[1, :], show_outliers=false, color = color, show_notch=true, label=xtreme)
         boxplot!(ax3, val[2] .+ zeros(size(sm)[2]),  sm[2, :], show_outliers=false, color = color, show_notch=true)
         boxplot!(ax3, val[3] .+ zeros(size(sm)[2]),  sm[3, :], show_outliers=false, color = color, show_notch=true)
         hlines!(ax3, 0, linestyle = "--", color = "black")
 
+
+        boxplot!(ax4, val[1] .+ zeros(size(lai)[2]),  lai[1, :], show_outliers=false, color = color, show_notch=true, label=xtreme)
+        boxplot!(ax4, val[2] .+ zeros(size(lai)[2]),  lai[2, :], show_outliers=false, color = color, show_notch=true)
+        boxplot!(ax4, val[3] .+ zeros(size(lai)[2]),  lai[3, :], show_outliers=false, color = color, show_notch=true)
+        
+        hlines!(ax4, 0, linestyle = "--", color = "black")
+        
     end
+    return ax1, ax2, ax3, ax4
 end
 
 for region in regions
-    print(region)
-    xtreme = "high"
-
+    vegetation_type = "crop"
     f = Figure(resolution=(1200,800))
-    ax1 = Axis(f[1,1], xticks= (11:10:31, ["winter", "spring", "summer"]), title= "Temp anomaly $(xtreme)_$(region)", ylabel="Temp [Celsius]", xgridvisible = false, ygridvisible = false)
-    ax2 = Axis(f[1,2], xticks= (11:10:31, ["winter", "spring", "summer"]), title= "Precip anomaly $(xtreme)_$(region)", ylabel="Precip", xgridvisible = false, ygridvisible = false)
-    ax3 = Axis(f[2,1], xticks= (11:10:31, ["winter", "spring", "summer"]), title= "Soil moisture anomaly $(xtreme)_$(region)", ylabel="SM", xgridvisible = false, ygridvisible = false)
+    ax1 = Axis(f[1,1], xticks= (11:10:31, ["winter", "spring", "summer"]), title= "Temp anomaly $(vegetation_type)_$(region)", ylabel="Temp [Celsius]", xgridvisible = false, ygridvisible = false)
+    ax2 = Axis(f[1,2], xticks= (11:10:31, ["winter", "spring", "summer"]), title= "Precip anomaly $(vegetation_type)_$(region)", ylabel="Precip", xgridvisible = false, ygridvisible = false)
+    ax3 = Axis(f[2,1], xticks= (11:10:31, ["winter", "spring", "summer"]), title= "Soil moisture anomaly $(vegetation_type)_$(region)", ylabel="SM", xgridvisible = false, ygridvisible = false)
+    ax4 = Axis(f[2,2], xticks= (11:10:31, ["winter", "spring", "summer"]), title= "LAI anomaly $(vegetation_type)_$(region)", ylabel="LAI", xgridvisible = false, ygridvisible = false)
 
-    plot_anomaly!("crop", xtreme, region, ax1, ax2, ax3)
-    plot_anomaly!("forest", xtreme, region, ax1, ax2, ax3)
-        
-    save("/Users/anand/Documents/data/pcv/images/anomaly_dynamics/$(xtreme)_$(region)_v4.pdf", f)
+    ax1, ax2, ax3, ax4 = plot_anomaly!(vegetation_type, "low", region, ax1, ax2, ax3, ax4)
+    ax1, ax2, ax3, ax4 = plot_anomaly!(vegetation_type, "high", region, ax1, ax2, ax3, ax4)
+    
+    try 
+        axislegend(ax1)
+        axislegend(ax2)
+        axislegend(ax3)
+        axislegend(ax4)
+    catch e 
+        print("Exception: ", e)
+    end
+    save("/Users/anand/Documents/data/pcv/images/anomaly_dynamics/$(vegetation_type)_$(region)_v4.pdf", f)
 end
