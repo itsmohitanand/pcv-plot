@@ -53,8 +53,8 @@ end
 
 function read_ori_data(vegetation_type, xtreme, region_name)
     ds_path = "/Users/anand/Documents/data/pcv/$(vegetation_type)_data/$(xtreme)"
-    fname = [path for path in readdir(ds_path) if startswith(path, "$(vegetation_type)_$(region_name)")]
-    
+    fname = [path for path in readdir(ds_path) if (startswith(path, "$(vegetation_type)_$(region_name)") & (occursin("v5.csv", path)) )  ]
+    print(fname)
     if !isempty(fname)
         df = DataFrame(CSV.File(joinpath(ds_path, fname[1]), header=1, delim="\t"))
     
