@@ -8,6 +8,7 @@ using GLM
 using Random
 using EvalMetrics
 using StatsBase
+using GLM
 
 include("core.jl")
 
@@ -15,7 +16,7 @@ p_list = [val for (k, val) in palette if k!="pale_grey"]
 
 # Simple schematic showing the methodology
 
-regions = ipcc_region()
+regions = ipcc_regions()
 
 function plot_hist(ax, vegetation_type, xtreme )
     i=1
@@ -34,10 +35,12 @@ function plot_hist(ax, vegetation_type, xtreme )
             
             df = read_ori_data(vegetation_type, xtreme, region)
             year = Int16.(df[!,  "# year"][df[!,"lai_su"].==1])
-            freq = fit(Histogram, year, 1982:2021).weights
-            freq = sign*2*freq ./ sum(freq)
-            
-            barplot!(ax, [1982:2020;], freq, offset = 1*i , color = color )
+            freq = fit(Histogram, year, 1983:2021).weights
+            freq = freq ./ sum(freq)   
+            time_x = [1983:2020;]
+            print(coeftable(lm(reshape(time_x, :,1), freq)))
+            freq = sign*2*freq  
+            barplot!(ax, time_x , freq, offset = 1*i , color = color )
             # h = hist!(ax, year, scale_to=2, offset = 3*i, color = color, bins=37, flip=true)        
         end
         i+=1
@@ -45,9 +48,12 @@ function plot_hist(ax, vegetation_type, xtreme )
     end
 end
 
+
+regions_acronym = [ipcc_acronym[region] for region in regions]
+
 f = Figure(resolution=(1200, 1400))
 
-ax1 = Axis(f[2,1], title = "Low vegetation activity", xgridvisible = false, ygridvisible=false, yticks= (1:1:19*1, regions))
+ax1 = Axis(f[2,1], title = "Low vegetation activity", xgridvisible = false, ygridvisible=false, yticks= (1:1:19*1, regions_acronym))
 ax2 = Axis(f[2,2], title = "High vegetation activity", xgridvisible = false, ygridvisible=false)
 # ax3 = Axis(f[2,1], title = "High crop activity", xgridvisible = false, ygridvisible=false, yticks= (1:1:19*1, regions))
 # ax4 = Axis(f[2,2], title = "High forest activity", xgridvisible = false, ygridvisible=false)
@@ -78,4 +84,4 @@ elem_2 = MarkerElement(color = palette["mint"], marker = :rect, markersize = 15,
 Legend(f[1,1:end], [elem_1, elem_2], ["Crop", "Forest"], orientation= :horizontal)
 f
 
-save("images/year_of_extreme.pdf", f)
+save("images/year_of_extreme_v2.pdf", f)

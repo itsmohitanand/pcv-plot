@@ -1,4 +1,4 @@
-using GeoMakie, CairoMakie
+using CairoMakie, GeoMakie
 using Shapefile
 using DataFrames
 using Makie.GeometryBasics
@@ -29,15 +29,17 @@ function plot_significance(ax, table, vegetation_type, xtreme)
     scatter!(ax, veg_location , markersize = 2.5, color = palette["pale_grey"])
 
     
-    ipcc_regions = ipcc_region()
+    regions = ipcc_regions()
 
     for i=1:length(table.geometry)
         list_points = Point2f[]
-        if table.Name[i] in ipcc_regions
+        if table.Name[i] in regions
             
-            ds_path = "/Users/anand/Documents/data/pcv/$(vegetation_type)_data/$(xtreme)"
-            fname = [path for path in readdir(ds_path) if occursin("logreg_$(xtreme)_$(vegetation_type)_$(table.Name[i])",path)]
-            fname_w = [path for path in readdir(ds_path) if occursin("logreg_winter_$(xtreme)_$(vegetation_type)_$(table.Name[i])",path)]
+            ds_path = "/Users/anand/Documents/data/pcv/plot_data/$(vegetation_type)_data/$(xtreme)/"
+            fname = [path for path in readdir(ds_path) if occursin("logreg_$(vegetation_type)_$(xtreme)_$(table.Name[i])",path)]
+            fname_w = [path for path in readdir(ds_path) if occursin("logreg_winter_$(vegetation_type)_$(xtreme)_$(table.Name[i])",path)]
+            
+            println(table.Name[i], fname)
 
             if !isempty(fname)
             
@@ -98,5 +100,5 @@ Legend(fig[1,1:end], [elem_1, elem_2, elem_3, elem_4], ["Vegetation", "Significa
 fig
 
 
-save("images/significance_plot.pdf", fig)
+save("images/significance_plot_v2.pdf", fig)
 

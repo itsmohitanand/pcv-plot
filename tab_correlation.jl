@@ -11,7 +11,7 @@ p_list = [val for (k, val) in palette if k!="pale_grey"]
 
 
 
-regions = ipcc_region()
+regions = ipcc_regions()
 
 function vegetation_cor(region, xtreme)
     df = read_ori_data("crop", xtreme, region)
@@ -32,6 +32,7 @@ end
 
 for region in regions
     println(region)
-    println(round(vegetation_cor(region, "high"), digits = 2))    
+    println(round(vegetation_cor(region, "high"), digits = 2))
+    println(round(vegetation_cor(region, "low"), digits = 2))    
 end
 

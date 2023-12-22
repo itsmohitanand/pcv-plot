@@ -7,5 +7,7 @@
 			"path": "../../data/pcv"
 		}
 	],
-    "settings": {}
+    "settings": {
+        "julia.environmentPath": "/Users/anand/Documents/repositories/pcv-plot"
+    }
 }

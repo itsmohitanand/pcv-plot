@@ -15,7 +15,7 @@ p_list = [val for (k, val) in palette if k!="pale_grey"]
 
 # Simple schematic showing the methodology
 
-regions = ipcc_region()
+regions = ipcc_regions()
 
 function standard_norm(df)
     for i in names(df)
@@ -33,13 +33,13 @@ function concatenate_season(df, var_name)
     var = zeros(3,size(df)[1])
 
     if var_name == "lai"
-        var[2, :] = df[!, var_name*"_spring"]
-        var[3, :] = df[!, var_name*"_summer"]
+        var[2, :] = df[!, var_name*"_sp"]
+        var[3, :] = df[!, var_name*"_su"]
     
     else
-        var[1, :] = df[!, var_name*"_winter"]
-        var[2, :] = df[!, var_name*"_spring"]
-        var[3, :] = df[!, var_name*"_summer"]
+        var[1, :] = df[!, var_name*"_w"]
+        var[2, :] = df[!, var_name*"_sp"]
+        var[3, :] = df[!, var_name*"_su"]
     
     end
 
@@ -49,7 +49,7 @@ end
 region  = regions[1]
 
 df = read_ori_data(vegetation_type, xtreme, region)
-df_linreg = select(df, Not([:sd_winter, :sd_spring, :sd_summer, ]))
+df_linreg = select(df, Not([:sd_w, :sd_sp, :sd_su, ]))
 df = filter(row -> all(!isnan, row), df)
 df_linreg = filter(row -> all(!isnan, row), df_linreg)
 df = standard_norm(df)
@@ -83,13 +83,13 @@ function plot_anomaly!(vegetation_type, xtreme, region, ax1, ax2, ax3, ax4, ax5)
     # end
 
     if !ismissing(df)
-        df_linreg = select(df, Not([:sd_winter, :sd_spring, :sd_summer]))
+        df_linreg = select(df, Not([:sd_w, :sd_sp, :sd_su]))
 
         df = filter(row -> all(!isnan, row), df)
         df_linreg = filter(row -> all(!isnan, row), df_linreg)
         
-        df = df[df[!, "lai_summer"].==1, :]
-        df_linreg = df_linreg[df_linreg[!, "lai_summer"].==1, :]
+        df = df[df[!, "lai_su"].==1, :]
+        df_linreg = df_linreg[df_linreg[!, "lai_su"].==1, :]
         
         # df = standard_norm(df)
         # df_linreg = standard_norm(df_linreg)
@@ -130,9 +130,16 @@ function plot_anomaly!(vegetation_type, xtreme, region, ax1, ax2, ax3, ax4, ax5)
         boxplot!(ax4, val[3] .+ zeros(size(sm)[2]),  sm[3, :], show_outliers=false, color = color, show_notch=true)
         hlines!(ax4, 0, linestyle = "--", color = "black")
 
-        boxplot!(ax5, val[1] .+ zeros(size(lai)[2]),  lai[1, :], show_outliers=false, color = color, show_notch=true, label=xtreme)
+        # boxplot!(ax5, val[1] .+ zeros(size(lai)[2]),  lai[1, :], show_outliers=false, color = color, show_notch=true, label=xtreme)
         boxplot!(ax5, val[2] .+ zeros(size(lai)[2]),  lai[2, :], show_outliers=false, color = color, show_notch=true)
+        # lai[3,:] .= NaN64
         # boxplot!(ax5, val[3] .+ zeros(size(lai)[2]),  lai[3, :], show_outliers=false, color = color, show_notch=true)
+        xlims!(ax1, (8,34))
+        xlims!(ax2, (8,34))
+        xlims!(ax3, (8,34))
+        xlims!(ax4, (8,34))
+        xlims!(ax5, (8,34))
+
         hlines!(ax5, 0, linestyle = "--", color = "black")
         
     end
@@ -140,7 +147,7 @@ function plot_anomaly!(vegetation_type, xtreme, region, ax1, ax2, ax3, ax4, ax5)
 end
 
 for region in regions
-    vegetation_type = "crop"
+    vegetation_type = "forest"
     f = Figure(resolution=(1200,800))
     ax1 = Axis(f[1,1], xticks= (11:10:31, ["winter", "spring", "summer"]), title= "Temp anomaly $(vegetation_type)_$(region)", ylabel="Temp [Celsius]", xgridvisible = false, ygridvisible = false)
     ax2 = Axis(f[1,2], xticks= (11:10:31, ["winter", "spring", "summer"]), title= "Precip anomaly $(vegetation_type)_$(region)", ylabel="Precip [mm]", xgridvisible = false, ygridvisible = false)
@@ -161,5 +168,5 @@ for region in regions
     catch e 
         print("Exception: ", e)
     end
-    save("/Users/anand/Documents/data/pcv/images/anomaly_dynamics/$(vegetation_type)_$(region)_v5.pdf", f)
+    save("/Users/anand/Documents/data/pcv/images/anomaly_dynamics/$(vegetation_type)_$(region)_v2.pdf", f)
 end

@@ -1,11 +1,6 @@
 
-function ipcc_region()
-    data_path = "/Users/anand/Documents/data/pcv/crop_data/high/"
-    region_1 = Set([split(path, "_")[2] for path in readdir(data_path) if !occursin("logreg",path)])
-    data_path = "/Users/anand/Documents/data/pcv/forest_data/high/"
-    region_2 = Set([split(path, "_")[2] for path in readdir(data_path) if !occursin("logreg",path)])
-    regions = delete!(union(region_1, region_2),"Sahara")
-    return sort(collect(regions))
+function ipcc_regions()
+    return sort(collect(keys(ipcc_acronym)))
 end 
 
 function crop_forest_location()
@@ -37,9 +32,9 @@ end
 
 function read_logreg_df(vegetation_type, xtreme, region_name)
 
-    ds_path = "/Users/anand/Documents/data/pcv/$(vegetation_type)_data/$(xtreme)"
-    fname = [path for path in readdir(ds_path) if occursin("logreg_$(xtreme)_$(vegetation_type)_$(region_name)",path)]
-    fname_w = [path for path in readdir(ds_path) if occursin("logreg_winter_$(xtreme)_$(vegetation_type)_$(region_name)",path)]
+    ds_path = "/Users/anand/Documents/data/pcv/plot_data/$(vegetation_type)_data/$(xtreme)/"
+    fname = [path for path in readdir(ds_path) if occursin("logreg_$(vegetation_type)_$(xtreme)_$(region_name)",path)]
+    fname_w = [path for path in readdir(ds_path) if occursin("logreg_winter_$(vegetation_type)_$(xtreme)_$(region_name)",path)]
 
     if !isempty(fname)
         df = DataFrame(CSV.File(joinpath(ds_path, fname[1]), header=1, delim="\t"))
@@ -52,9 +47,8 @@ function read_logreg_df(vegetation_type, xtreme, region_name)
 end
 
 function read_ori_data(vegetation_type, xtreme, region_name)
-    ds_path = "/Users/anand/Documents/data/pcv/$(vegetation_type)_data/$(xtreme)"
-    fname = [path for path in readdir(ds_path) if (startswith(path, "$(vegetation_type)_$(region_name)") & (occursin("v5.csv", path)) )  ]
-    print(fname)
+    ds_path = "/Users/anand/Documents/data/pcv/plot_data/$(vegetation_type)_data/$(xtreme)/"
+    fname = [path for path in readdir(ds_path) if (startswith(path, "$(vegetation_type)_$(xtreme)_$(region_name)") & (occursin("v7.csv", path)) )  ]
     if !isempty(fname)
         df = DataFrame(CSV.File(joinpath(ds_path, fname[1]), header=1, delim="\t"))
     
@@ -76,7 +70,7 @@ function anomaly(df, var_name)
 end
 
 function winter_climate_anomaly(df)
-    return anomaly(df, "t2m_winter"), anomaly(df, "tp_winter")
+    return anomaly(df, "t2m_w"), anomaly(df, "tp_w")
 end
 
 palette = Dict(    
@@ -91,23 +85,23 @@ palette = Dict(
     "pale_grey" =>  "#DDDDDD",
     )
 
-index_significant = Dict(
-    "C.North-America" => 1,
-    "E.Asia" => 2,
-    "E.C.Asia" => 3,
-    "E.Siberia" => 4,
-    "E.Europe" => 5,
-    "E.North-America" => 6,
-    "Mediterranean" => 7,
-    "N.E.North-America" => 8,
-    "Russian-Arctic" => 9,
-    "Russian-Far-East" => 10,
-    "W.Siberia" => 11,
-    "W.C.Asia" => 12,
-)
+# index_significant = Dict(
+#     "C.North-America" => 1,
+#     "E.Asia" => 2,
+#     "E.C.Asia" => 3,
+#     "E.Siberia" => 4,
+#     "E.Europe" => 5,
+#     "E.North-America" => 6,
+#     "Mediterranean" => 7,
+#     "N.E.North-America" => 8,
+#     "Russian-Arctic" => 9,
+#     "Russian-Far-East" => 10,
+#     "W.Siberia" => 11,
+#     "W.C.Asia" => 12,
+# )
 
 ipcc_acronym = Dict(
-    "C.North-America" => "CNA",
+"C.North-America" => "CNA",
  "E.Asia" => "EAS",
  "E.C.Asia" => "ECA",
  "E.Europe" => "EEU",

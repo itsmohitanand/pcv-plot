@@ -5,14 +5,13 @@ using Statistics
 using NPZ
 using ColorSchemes
 
-
 palette = ColorSchemes.colorschemes[:mk_12]
 
 include("core.jl")
 
 path = "/Users/anand/Documents/data/pcv/IPCC-WGI-reference-regions-v4_shapefile/IPCC-WGI-reference-regions-v4.shp"
 
-ipcc_regions = ipcc_region()
+region_list = ipcc_regions()
 
 
 function coefficient_boxplot(ax, vegetation_type, xtreme)
@@ -22,7 +21,7 @@ function coefficient_boxplot(ax, vegetation_type, xtreme)
     else
         marker = :star4
     end
-    for (i, regions) in enumerate(ipcc_regions)
+    for (i, regions) in enumerate(region_list)
         df, df_w = read_logreg_df(vegetation_type, xtreme, regions)
         color = :grey80
         if !ismissing(df)
@@ -33,10 +32,16 @@ function coefficient_boxplot(ax, vegetation_type, xtreme)
                 else
                     color = (palette["mint"])
                 end
+            
             end
 
             scatter!(ax, mean(df_w[!, "t2m_winter"]), mean(df_w[!, "tp_winter"]), color =color, marker=marker, markersize = 20)
 
+            if winter_significance(df, df_w)
+                errorbars!(ax, [mean(df_w[!, "t2m_winter"])], [mean(df_w[!, "tp_winter"])], std(df_w[!, "t2m_winter"]), direction = :x, whiskerwidth=5, color=:grey20)
+                errorbars!(ax, [mean(df_w[!, "t2m_winter"])], [mean(df_w[!, "tp_winter"])], std(df_w[!, "tp_winter"]), direction = :y, whiskerwidth=5, color = :grey20)
+            end
+            
         end
     end
 
@@ -47,7 +52,7 @@ end
 
 function plot_anomalies(ax, vegetation_type, xtreme)
 
-    for region in ipcc_regions
+    for region in region_list
         if vegetation_type == "crop"
             marker = :diamond
         else
@@ -88,7 +93,7 @@ function plot_anomalies(ax, vegetation_type, xtreme)
 end
 
 function anomalies_text(ax, vegetation_type, xtreme)
-    for region in ipcc_regions
+    for region in region_list
         
         df, df_w = read_logreg_df(vegetation_type, xtreme, region)
 
@@ -145,9 +150,9 @@ function anomalies_text(ax, vegetation_type, xtreme)
 end
 
 function coef_text(ax, vegetation_type, xtreme)
-    for (i, regions) in enumerate(ipcc_regions)
+    for (i, regions) in enumerate(region_list)
         df, df_w = read_logreg_df(vegetation_type, xtreme, regions)
-        
+        print(regions)
         if vegetation_type == "crop"
             if xtreme == "low"
                 shift = Point2f(0.012, 0.015)
@@ -222,13 +227,13 @@ plot_anomalies(ax3, "crop", "low")
 plot_anomalies(ax3, "forest", "low")
 plot_anomalies(ax4, "crop", "high")
 plot_anomalies(ax4, "forest", "high")
-
+f
 anomalies_text(ax3, "crop", "low")
 anomalies_text(ax3, "forest", "low")
 anomalies_text(ax4, "crop", "high")
 anomalies_text(ax4, "forest", "high")
 
-
+f
 elem_1 = MarkerElement(color = :grey80, marker = :diamond, markersize = 15, points=Point2f[(0.5,0.5)])
 elem_2 = MarkerElement(color = :grey80, marker = :star4, markersize = 15, points=Point2f[(0.5,0.5)])
 elem_3 = MarkerElement(color = palette["orange"], marker = :diamond, markersize = 15, points=Point2f[(0.5,0.5) ])
@@ -238,4 +243,4 @@ Legend(f[1,1:2], [elem_1, elem_2, elem_3, elem_4], ["Crop Region", "Forest Regio
 
 f
 
-save("images/winter_coefficient_anomaly.pdf", f)
+save("images/winter_coefficient_anomaly_v2.pdf", f)

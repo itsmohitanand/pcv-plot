@@ -13,7 +13,7 @@ include("core.jl")
 
 # Simple schematic showing the methodology
 
-regions = ipcc_region()
+regions = ipcc_regions()
 
 r = regions[2]
 
@@ -38,9 +38,9 @@ ax2 = Axis(f[1,2], limits = (0.64,.74,0,20), xgridvisible = false, ygridvisible 
 auc_w_list = []
 auc_list = []
 for i=1:100
-    train, test = splitdf(df, .85);
+    train, test = splitdf(df, .80);
 
-    fm = @formula(lai_su ~ t2m_winter + tp_winter + t2m_spring + tp_spring  + t2m_summer + tp_summer )
+    fm = @formula(lai_su ~ t2m_w + tp_w + t2m_sp + tp_sp  + t2m_su + tp_su )
     l1 = glm(fm, train, Binomial(), ProbitLink())
 
     scores = Float64.(predict(l1, test))
@@ -51,7 +51,7 @@ for i=1:100
 
     push!(auc_w_list, auc_trapezoidal(roccurve(target, scores)...))
 
-    fm = @formula(lai_su ~ t2m_spring + tp_spring  + t2m_summer + tp_summer )
+    fm = @formula(lai_su ~ t2m_sp + tp_sp  + t2m_su + tp_su )
     l1 = glm(fm, train, Binomial(), ProbitLink())
 
     scores = Float64.(predict(l1, test))
@@ -71,5 +71,5 @@ hist!(ax2, auc_w_list, color = palette["light_cyan"])
 vlines!(ax2, quantile(auc_list, 0.9), color = :black, linestyle = "--" )
 vlines!(ax2, mean(auc_w_list), color = :black )
 f
-save("images/method.pdf", f)
+save("images/method_v2.pdf", f)
 
