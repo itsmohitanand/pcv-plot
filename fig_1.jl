@@ -14,6 +14,8 @@ path = "/Users/anand/Documents/data/pcv/IPCC-WGI-reference-regions-v4_shapefile/
 
 table = Shapefile.Table(path)
 
+table.geometry[1]
+
 function plot_significance(ax, table, vegetation_type, xtreme)
 
     crop_location, forest_location = crop_forest_location()
@@ -39,7 +41,6 @@ function plot_significance(ax, table, vegetation_type, xtreme)
             fname = [path for path in readdir(ds_path) if occursin("logreg_$(vegetation_type)_$(xtreme)_$(table.Name[i])",path)]
             fname_w = [path for path in readdir(ds_path) if occursin("logreg_winter_$(vegetation_type)_$(xtreme)_$(table.Name[i])",path)]
             
-            println(table.Name[i], fname)
 
             if !isempty(fname)
             
@@ -50,9 +51,9 @@ function plot_significance(ax, table, vegetation_type, xtreme)
                 df_w = DataFrame(CSV.File(joinpath(ds_path, fname_w), header=1, delim="\t"))
                 
                 sig = winter_significance(df, df_w)
-        
+
                 if sig
-                    println(table.Name[i])
+                    
                     if vegetation_type == "crop"
                         color = (palette["orange"], 0.3)
                     else
@@ -61,14 +62,55 @@ function plot_significance(ax, table, vegetation_type, xtreme)
                 else
                     color = (:grey80, 0.3)
                 end
-                
+            
                 for point in table.geometry[i].points
                     p = (point.x, point.y)
 
                     push!(list_points, p)
                     
                 end
-                hm = poly!(ax, list_points, color = color, colormap=:viridis, strokecolor = :black, strokewidth=1)
+
+                if i==29
+
+                    hm = poly!(ax, list_points[1:680], color = color, colormap=:viridis, strokecolor = :black, strokewidth=1)
+                    hm = poly!(ax, list_points[681:end], color = color, colormap=:viridis, strokecolor = :black, strokewidth=1)
+                    c = mean(list_points[1:680])
+
+                else
+                    hm = poly!(ax, list_points, color = color, colormap=:viridis, strokecolor = :black, strokewidth=1)
+                    c = mean(list_points)
+                end
+
+                if sig
+                    name = ipcc_acronym[table.Name[i]]
+                    if name == "NEN"
+                        text!(ax,c[1]-18, c[2]-12, text=name)
+                     
+                    elseif name == "ENA"
+                        text!(ax,c[1]-10, c[2]+1, text=name)
+                    elseif name == "NWN"
+                        text!(ax,c[1]+10, c[2]-10, text=name)
+                    elseif name == "NEU"
+                        text!(ax,c[1]-20, c[2]-2, text=name)
+                    elseif name == "RAR"
+                        text!(ax,c[1]-15, c[2]-7, text=name)
+                    elseif name == "RFE"
+                        text!(ax,c[1]-22, c[2], text=name)
+                    elseif name == "EAS"
+                        text!(ax,c[1]-20, c[2]-7, text=name)
+                    elseif name == "WCE"
+                        text!(ax,c[1]-5, c[2]-5, text=name)
+                    elseif name == "MED"
+                        text!(ax,c[1]-20, c[2]-7, text=name)
+                    elseif name == "WCA"
+                        text!(ax,c[1]-10, c[2]-6, text=name)
+                    else
+
+                        text!(ax,c[1]-10, c[2]-10, text=name)
+
+                    end
+
+                end
             end
         end
 
@@ -77,12 +119,13 @@ function plot_significance(ax, table, vegetation_type, xtreme)
 end
 
 
-fig = Figure(resolution=(1200,1000))
+fig = Figure(resolution=(1100,1100))
 
-ax1 = GeoAxis(fig[2,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "Low crop activity", xticklabelsvisible=false, yticklabelsvisible=false, yticks=[0,90], xticks=[-180,180] )
-ax2 = GeoAxis(fig[3,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "Low forest activity", xticklabelsvisible=false, yticklabelsvisible=false, yticks=[0,90], xticks=[-180,180]   )
-ax3 = GeoAxis(fig[4,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "High crop activity", xticklabelsvisible=false, yticklabelsvisible=false, yticks=[0,90], xticks=[-180,180]   )
-ax4 = GeoAxis(fig[5,1], latlims=(25,75), dest = "+proj=cea", coastlines = true, xgridvisible = false, ygridvisible=false, title = "High forest activity", xticklabelsvisible=false, yticklabelsvisible=false, yticks=[0,90], xticks=[-180,180]   )
+ax1 = GeoAxis(fig[2,1], latlims=(25,75), dest = "+proj=eqearth", coastlines = true, xgridvisible = false, ygridvisible=false, title = "Low LAI (Crop)", xticklabelsvisible=true, yticklabelsvisible=true, yticks=[25,50,75], xticks=[-90,0,90], xticklabelpad=20, titlegap=20, coastline_attributes= (color=:grey40, linewidth=1.0,) )
+
+ax2 = GeoAxis(fig[3,1], latlims=(25,75), dest = "+proj=eqearth", coastlines = true, xgridvisible = false, ygridvisible=false, title = "Low LAI (Forest)", xticklabelsvisible=true, yticklabelsvisible=true, yticks=[25,50,75], xticks=[-90,0,90], xticklabelpad=20 , titlegap=20, coastline_attributes= (color=:grey40, linewidth=1.0,)   )
+ax3 = GeoAxis(fig[4,1], latlims=(25,75), dest = "+proj=eqearth", coastlines = true, xgridvisible = false, ygridvisible=false, title = "High LAI (Crop)", xticklabelsvisible=true, yticklabelsvisible=true, yticks=[25,50,75], xticks=[-90,0,90], xticklabelpad=20 , titlegap=20, coastline_attributes= (color=:grey40, linewidth=1.0,)   )
+ax4 = GeoAxis(fig[5,1], latlims=(25,75), dest = "+proj=eqearth", coastlines = true, xgridvisible = false, ygridvisible=false, title = "High LAI (Forest)", xticklabelsvisible=true, yticklabelsvisible=true, yticks=[25,50,75], xticks=[-90,0,90], xticklabelpad=20, titlegap=20, coastline_attributes= (color=:grey40, linewidth=1.0,)    )
 
 
 plot_significance(ax1, table, "crop", "low")
@@ -95,10 +138,9 @@ elem_2 = [PolyElement(color = (palette["orange"], 0.3), strokecolor = :black, st
 elem_3 = [PolyElement(color = (palette["mint"], 0.3), strokecolor = :black, strokewidth = 1, points = Point2f[(0, 0), (0, 1), (1,1), (1, 0)])]
 elem_4 = [PolyElement(color = (:grey80, 0.3), strokecolor = :black, strokewidth = 1, points = Point2f[(0, 0), (0, 1), (1,1), (1, 0)])]
 
-Legend(fig[1,1:end], [elem_1, elem_2, elem_3, elem_4], ["Vegetation", "Significant winter (Crop)", "Significant winter (Forest)", "Other Region"], orientation= :horizontal)
+Legend(fig[1,1:end], [elem_1, elem_2, elem_3, elem_4], ["Vegetation", "Significant winter (Crop)", "Significant winter (Forest)", "Other Region"], orientation= :horizontal, framevisible=false)
 
 fig
 
 
 save("images/significance_plot_v2.pdf", fig)
-
