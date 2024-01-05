@@ -9,6 +9,7 @@ using Random
 using EvalMetrics
 using StatsBase
 using GLM
+using MannKendall_XY
 
 include("core.jl")
 
@@ -38,7 +39,9 @@ function plot_hist(ax, vegetation_type, xtreme )
             freq = fit(Histogram, year, 1983:2021).weights
             freq = freq ./ sum(freq)   
             time_x = [1983:2020;]
-            print(coeftable(lm(reshape(time_x, :,1), freq)))
+            # print(coeftable(lm(reshape(time_x, :,1), freq)))
+            println(region)
+            println(freq)            
             freq = sign*2*freq  
             barplot!(ax, time_x , freq, offset = 1*i , color = color )
             # h = hist!(ax, year, scale_to=2, offset = 3*i, color = color, bins=37, flip=true)        
@@ -85,3 +88,24 @@ Legend(f[1,1:end], [elem_1, elem_2], ["Crop", "Forest"], orientation= :horizonta
 f
 
 save("images/year_of_extreme_v2.pdf", f)
+
+x = [0.02694610778443114, 0.005239520958083832, 0.005389221556886228, 0.0007485029940119761, 0.003143712574850299, 0.06377245508982037, 0.047005988023952096, 0.007634730538922155, 0.004640718562874252, 0.003143712574850299]
+
+mk_original_test(x)
+
+unique_x = unique(x)
+g = length(unique_x)
+
+n = length(x)
+tp = zeros(length(unique_x))
+demo = ones(n)
+
+for i in 1:g
+    tp[i] = sum(demo[x == unique_x[i]])
+end
+
+unique_x
+
+sum(x .== unique_x[5])
+
+var_s = (n*(n-1)*(2*n+5) - sum(tp*(tp-1)*(2*tp+5)))/18

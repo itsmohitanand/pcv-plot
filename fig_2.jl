@@ -243,4 +243,4 @@ Legend(f[1,1:2], [elem_1, elem_2, elem_3, elem_4], ["Crop Region", "Forest Regio
 
 f
 
-save("images/winter_coefficient_anomaly_v2.pdf", f)
+save("images/winter_coefficient_anomaly_v3.pdf", f)

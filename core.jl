@@ -1,3 +1,15 @@
+using DataFrames
+using CSV
+
+
+function read_auc(vegetation, xtreme)
+    ds_path = "/Users/anand/Documents/data/pcv/plot_data/"
+    fname = "auc_$(vegetation)_$(xtreme)_v3.csv"
+    df = DataFrame(CSV.File(joinpath(ds_path, fname), header=1, delim="\t"))
+
+    return df
+end
+
 
 function ipcc_regions()
     return sort(collect(keys(ipcc_acronym)))
@@ -48,7 +60,7 @@ end
 
 function read_ori_data(vegetation_type, xtreme, region_name)
     ds_path = "/Users/anand/Documents/data/pcv/plot_data/$(vegetation_type)_data/$(xtreme)/"
-    fname = [path for path in readdir(ds_path) if (startswith(path, "$(vegetation_type)_$(xtreme)_$(region_name)") & (occursin("v7.csv", path)) )  ]
+    fname = [path for path in readdir(ds_path) if (startswith(path, "$(vegetation_type)_$(xtreme)_$(region_name)") & (occursin("v3.csv", path)) )  ]
     if !isempty(fname)
         df = DataFrame(CSV.File(joinpath(ds_path, fname[1]), header=1, delim="\t"))
     
@@ -60,7 +72,7 @@ end
 
 
 function winter_significance(df, df_w)
-    diff = max(mean(df_w[!,"AUC"]) - quantile(df[!,"AUC"], 0.9),0)
+    diff = max(mean(df_w[!,"AUC"]) - quantile(df[!,"AUC"], 0.95),0)
 
     return diff>0
 end

@@ -143,4 +143,4 @@ Legend(fig[1,1:end], [elem_1, elem_2, elem_3, elem_4], ["Vegetation", "Significa
 fig
 
 
-save("images/significance_plot_v2.pdf", fig)
+save("images/significance_plot_v4.pdf", fig)
