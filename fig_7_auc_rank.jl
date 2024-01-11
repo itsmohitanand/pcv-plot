@@ -25,7 +25,7 @@ function rank_auc_diff(f, ax_loc, df, color, title )
     ax =Axis(f[ax_loc[1], ax_loc[2]], xticks = (x, xticklabels), xticklabelrotation = π/2, title=title)
     
     for (i , sort_index) in enumerate(sorted_index)
-        barplot!(ax, x[i], diff[sort_index], color = color  )
+        barplot!(ax, x[i], diff[sort_index], color = color)
     end
 
 end

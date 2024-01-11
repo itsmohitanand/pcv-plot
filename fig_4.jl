@@ -22,7 +22,7 @@ regions = ipcc_regions()
 function plot_hist(ax, vegetation_type, xtreme )
     i=1
     for region in regions    
-        df, df_w = read_logreg_df(vegetation_type, xtreme, region)
+        df = read_ori_data(vegetation_type, xtreme, region)
 
         if vegetation_type == "crop"
             color = palette["orange"]
@@ -34,7 +34,6 @@ function plot_hist(ax, vegetation_type, xtreme )
 
         if !ismissing(df)
             
-            df = read_ori_data(vegetation_type, xtreme, region)
             year = Int16.(df[!,  "# year"][df[!,"lai_su"].==1])
             freq = fit(Histogram, year, 1983:2021).weights
             freq = freq ./ sum(freq)   
@@ -87,7 +86,7 @@ elem_2 = MarkerElement(color = palette["mint"], marker = :rect, markersize = 15,
 Legend(f[1,1:end], [elem_1, elem_2], ["Crop", "Forest"], orientation= :horizontal)
 f
 
-save("images/year_of_extreme_v2.pdf", f)
+save("images/year_of_extreme_v3.pdf", f)
 
 x = [0.02694610778443114, 0.005239520958083832, 0.005389221556886228, 0.0007485029940119761, 0.003143712574850299, 0.06377245508982037, 0.047005988023952096, 0.007634730538922155, 0.004640718562874252, 0.003143712574850299]
 

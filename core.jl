@@ -2,14 +2,13 @@ using DataFrames
 using CSV
 
 
-function read_auc(vegetation, xtreme)
+function read_log_df(vegetation, xtreme)
     ds_path = "/Users/anand/Documents/data/pcv/plot_data/"
-    fname = "auc_$(vegetation)_$(xtreme)_v3.csv"
+    fname = "log_$(vegetation)_$(xtreme)_v3.csv"
     df = DataFrame(CSV.File(joinpath(ds_path, fname), header=1, delim="\t"))
 
     return df
 end
-
 
 function ipcc_regions()
     return sort(collect(keys(ipcc_acronym)))
