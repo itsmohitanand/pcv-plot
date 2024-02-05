@@ -96,6 +96,9 @@ palette = Dict(
     "pale_grey" =>  "#DDDDDD",
     )
 
+crop_gradient = range(colorant"#EE8866", stop = colorant"white", length=10)
+forest_gradient = range(colorant"#44BB99", stop = colorant"white", length=10)
+
 # index_significant = Dict(
 #     "C.North-America" => 1,
 #     "E.Asia" => 2,

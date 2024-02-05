@@ -53,40 +53,43 @@ end
 
 regions_acronym = [ipcc_acronym[region] for region in regions]
 
-f = Figure(resolution=(1200, 1400))
+with_theme(theme_latexfonts()) do
 
-ax1 = Axis(f[2,1], title = "Low vegetation activity", xgridvisible = false, ygridvisible=false, yticks= (1:1:19*1, regions_acronym))
-ax2 = Axis(f[2,2], title = "High vegetation activity", xgridvisible = false, ygridvisible=false)
-# ax3 = Axis(f[2,1], title = "High crop activity", xgridvisible = false, ygridvisible=false, yticks= (1:1:19*1, regions))
-# ax4 = Axis(f[2,2], title = "High forest activity", xgridvisible = false, ygridvisible=false)
+    f = Figure(resolution=(1200, 1400), fontsize=18)
 
-ylims!(ax1, (0.5,19.5))
-ylims!(ax2, (0.5,19.5))
-# ylims!(ax3, (1,20))
-# ylims!(ax4, (1,20))
+    ax1 = Axis(f[2,1], title = L"LAI_{low}", xgridvisible = false, ygridvisible=false, yticks= (1:1:19*1, regions_acronym))
+    ax2 = Axis(f[2,2], title = L"LAI_{high}", xgridvisible = false, ygridvisible=false)
+    # ax3 = Axis(f[2,1], title = "High crop activity", xgridvisible = false, ygridvisible=false, yticks= (1:1:19*1, regions))
+    # ax4 = Axis(f[2,2], title = "High forest activity", xgridvisible = false, ygridvisible=false)
 
-plot_hist(ax1, "crop", "low")
-plot_hist(ax1, "forest", "low")
+    ylims!(ax1, (0.5,19.5))
+    ylims!(ax2, (0.5,19.5))
+    # ylims!(ax3, (1,20))
+    # ylims!(ax4, (1,20))
 
-plot_hist(ax2, "crop", "high")
-plot_hist(ax2, "forest", "high")
-hidespines!(ax1, :r, :t)
-hidespines!(ax2, :r, :t, :l)
+    plot_hist(ax1, "crop", "low")
+    plot_hist(ax1, "forest", "low")
 
-# hidespines!(ax3, :r, :t)
-# hidespines!(ax4, :r, :t, :l)
-# hideydecorations!(ax1)
-hideydecorations!(ax2)
-# hideydecorations!(ax3)
-# hideydecorations!(ax4)
+    plot_hist(ax2, "crop", "high")
+    plot_hist(ax2, "forest", "high")
+    hidespines!(ax1, :r, :t)
+    hidespines!(ax2, :r, :t, :l)
 
-elem_1 = MarkerElement(color = palette["orange"], marker = :rect, markersize = 15, points=Point2f[(0.5,0.5) ])
-elem_2 = MarkerElement(color = palette["mint"], marker = :rect, markersize = 15, points=Point2f[(0.5,0.5)])
+    # hidespines!(ax3, :r, :t)
+    # hidespines!(ax4, :r, :t, :l)
+    # hideydecorations!(ax1)
+    hideydecorations!(ax2)
+    # hideydecorations!(ax3)
+    # hideydecorations!(ax4)
 
-Legend(f[1,1:end], [elem_1, elem_2], ["Crop", "Forest"], orientation= :horizontal)
-f
+    elem_1 = MarkerElement(color = palette["orange"], marker = :rect, markersize = 15, points=Point2f[(0.5,0.5) ])
+    elem_2 = MarkerElement(color = palette["mint"], marker = :rect, markersize = 15, points=Point2f[(0.5,0.5)])
 
-save("images/year_of_extreme_v3.pdf", f)
+    Legend(f[1,1:end], [elem_1, elem_2], ["Crop", "Forest"], orientation= :horizontal, framevisible=false)
+    f
+    save("images/year_of_extreme_v3.pdf", f)
+
+end
 
 x = [0.02694610778443114, 0.005239520958083832, 0.005389221556886228, 0.0007485029940119761, 0.003143712574850299, 0.06377245508982037, 0.047005988023952096, 0.007634730538922155, 0.004640718562874252, 0.003143712574850299]
 

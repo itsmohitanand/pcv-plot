@@ -68,6 +68,7 @@ function coefficient_boxplot(ax, vegetation_type, xtreme)
                     end
                     
                     text!(ax, Point2f(log_reg[!, col_name][4], log_reg[!, col_name][5]) - shift, text=ipcc_acronym[regions])
+                    hidespines!(ax, :r, :t)
                 end
                 
             end
@@ -79,32 +80,55 @@ function coefficient_boxplot(ax, vegetation_type, xtreme)
     vlines!(ax, 0, color = palette["light_blue"], linestyle = :dash)
 end
 
-f = Figure(resolution=(1200, 600))
-ax1 = Axis(f[2,1], xgridvisible = false, ygridvisible = false,  xlabel="Winter temperature coefficient", ylabel="Winter precipitaiton coefficient", title = "Low LAI")
-ax2 = Axis(f[2,2], xgridvisible = false, ygridvisible = false, xlabel="Winter temperature coefficient", title = "High LAI")
-# ax3 = Axis(f[3,1], xgridvisible = false, ygridvisible = false, xlabel="Winter temperature coefficient", ylabel="Winter precipitaiton coefficient",  title = "Low LAI (Forest)")
-# ax4 = Axis(f[3,2], xgridvisible = false, ygridvisible = false, xlabel="Winter temperature coefficient",  title = "High LAI (Forest)")
+with_theme(theme_latexfonts()) do
+
+    f = Figure(resolution=(1200, 600), fontsize = 18)
+    ax1 = Axis(f[2,1], xgridvisible = false, ygridvisible = false,  xlabel=L"Winter temperature coefficient ($\alpha_5$)", ylabel=L"Winter precipitaiton coefficient ($\alpha_6$)", title = L"LAI_{low}", titlegap = 20)
+    ax2 = Axis(f[2,2], xgridvisible = false, ygridvisible = false, xlabel=L"Winter temperature coefficient ($\alpha_5$)", title = L"LAI_{high}", titlegap=20)
+    # ax3 = Axis(f[3,1], xgridvisible = false, ygridvisible = false, xlabel="Winter temperature coefficient", ylabel="Winter precipitaiton coefficient",  title = "Low LAI (Forest)")
+    # ax4 = Axis(f[3,2], xgridvisible = false, ygridvisible = false, xlabel="Winter temperature coefficient",  title = "High LAI (Forest)")
+
+    f
+    coefficient_boxplot(ax1, "crop", "low")
+    coefficient_boxplot(ax1, "forest", "low")
+    f
+    coefficient_boxplot(ax2, "crop", "high")
+    coefficient_boxplot(ax2, "forest", "high")
+    f
+
+    # coefficient_boxplot(ax2, "crop", "high")
+    # coefficient_boxplot(ax3, "forest", "low")
+    # coefficient_boxplot(ax4, "forest", "high")
+    # f
+
+    elem_1 = MarkerElement(color = palette["orange"], marker = :diamond, markersize = 15, points=Point2f[(0.5,0.5) ])
+    elem_2 = MarkerElement(color = palette["mint"], marker = :star4, markersize = 15, points=Point2f[(0.5,0.5)])
+    elem_3 = MarkerElement(color = :grey80, marker = :diamond, markersize = 15, points=Point2f[(0.5,0.5)])
+    elem_4 = MarkerElement(color = :grey80, marker = :star4, markersize = 15, points=Point2f[(0.5,0.5)])
+
+    Legend(f[1,1:2], [elem_1, elem_2, elem_3, elem_4], ["Winter Preconditioned Region (Crop)", "Winter Preconditioned Region (Forest)", "Other regions (Crop)", "Other regions (Forest)"], orientation= :horizontal, framevisible=false)
 
 
-coefficient_boxplot(ax1, "crop", "low")
-coefficient_boxplot(ax1, "forest", "low")
-f
-coefficient_boxplot(ax2, "crop", "high")
-coefficient_boxplot(ax2, "forest", "high")
-f
+    left_pad = 10
+    top_pad = 20
+    Label(
+    f[2, 1, TopLeft()],
+        "a)",
+        font = "TeX Gyre Heros Bold",
+        fontsize = 22,
+        padding = (0, left_pad, top_pad, 0),
+        halign = :right,
+        )
 
-# coefficient_boxplot(ax2, "crop", "high")
-# coefficient_boxplot(ax3, "forest", "low")
-# coefficient_boxplot(ax4, "forest", "high")
-# f
+    Label(
+    f[2, 2, TopLeft()],
+        "b)",
+        font = "TeX Gyre Heros Bold",
+        fontsize = 22,
+        padding = (0, left_pad, top_pad, 0),
+        halign = :right,
+        )
+        save("images/winter_coefficient_v3.pdf", f)
 
-elem_1 = MarkerElement(color = palette["orange"], marker = :diamond, markersize = 15, points=Point2f[(0.5,0.5) ])
-elem_2 = MarkerElement(color = palette["mint"], marker = :star, markersize = 15, points=Point2f[(0.5,0.5)])
-elem_3 = MarkerElement(color = :grey80, marker = :diamond, markersize = 15, points=Point2f[(0.5,0.5)])
-elem_4 = MarkerElement(color = :grey80, marker = :star4, markersize = 15, points=Point2f[(0.5,0.5)])
-
-Legend(f[1,1:2], [elem_1, elem_2, elem_3, elem_4], ["Winter Preconditioned Region (Crop)", "Winter Preconditioned Region (Forest)", "Other regions (Crop)", "Other regions (Forest)"], orientation= :horizontal, framevisible=false)
-
-f
-
-save("images/winter_coefficient_v3.pdf", f)
+    f
+end
