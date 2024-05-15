@@ -14,6 +14,8 @@ path = "/Users/anand/Documents/data/pcv/IPCC-WGI-reference-regions-v4_shapefile/
 region_list = ipcc_regions()
 
 
+
+
 function coefficient_boxplot(ax, vegetation_type, xtreme)
     
     if vegetation_type == "crop"
@@ -244,3 +246,18 @@ Legend(f[1,1:2], [elem_1, elem_2, elem_3, elem_4], ["Crop Region", "Forest Regio
 f
 
 save("images/winter_coefficient_anomaly_v3.pdf", f)
+
+
+# Extra data
+region_list = ipcc_regions()
+
+vegetation_type = "crop"
+xtreme = "high"
+for (i, regions) in enumerate(region_list)
+    print(i)
+    df, df_w = read_logreg_df(vegetation_type, xtreme, regions)
+    if !ismissing(df)   
+        print(df)
+        break
+    end
+end

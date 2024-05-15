@@ -127,7 +127,6 @@ function sorted_anomaly(vegetation_type, xtreme, data, col_name)
     return new_data, new_col_name
 end
 
-
 cl = cl[:, 2:end]
 ch = ch[:, 2:end]
 fl = fl[:, 2:end]
@@ -137,6 +136,26 @@ cl, name_cl = sorted_anomaly("crop", "low", cl, name_cl)
 ch, name_ch = sorted_anomaly("crop", "high", ch, name_ch)
 fl, name_fl = sorted_anomaly("forest", "low", fl, name_fl)
 fh, name_fh = sorted_anomaly("forest", "high", fh, name_fh)
+
+function split_t(data)
+    d1 = deepcopy(data)
+    d2 = deepcopy(data)
+    
+    d1[2:4, :] .= NaN
+    d1[6:9, :] .= NaN
+    d1[11:12,:] .= NaN
+
+    d2[1, :] .= NaN
+    d2[5, :] .= NaN
+    d2[10, :] .= NaN
+
+    return d2, d1
+end
+
+cl_no_t, cl_t = split_t(cl)
+ch_no_t, ch_t = split_t(ch)
+fl_no_t, fl_t = split_t(fl)
+fh_no_t, fh_t = split_t(fh)
 
 
 xticks = ([1:12;], [L"$T_{w}$", L"$P_{w}$", L"$SM_{w}$ ", L"$SD_{w}$", L"$T_{sp}$", L"$P_{sp}$", L"$SM_{sp}$", L"$SD_{sp}$", L"$LAI_{sp}$", L"$T_{su}$", L"$P_{su}$", L"$SM_{su}$"] )
@@ -149,11 +168,23 @@ with_theme(theme_latexfonts()) do
     ax_fl = Axis(f[1,2], title = L"LAI_{low}^{forest}", yticks= ([1:8;],[ipcc_acronym[name] for name in name_fl]), xticks = ([1:13;], ["" for i=1:13]), xticklabelrotation=0*π/6)
     ax_fh = Axis(f[2,2], title = L"LAI_{high}^{forest}", yticks= ([1:5;],[ipcc_acronym[name] for name in name_fh]), xticks = xticks, xticklabelrotation=0*π/6, xgridvisible=false, ygridvisible=false)
 
-    jointlimits = (-1,1)
-    heatmap!(ax_cl, cl[1:end-1, :], colormap=:BrBG_5, colorrange = jointlimits)
-    heatmap!(ax_ch, ch[1:end-1, :], colormap=:BrBG_5, colorrange = jointlimits)
-    heatmap!(ax_fl, fl[1:end-1, :], colormap=:BrBG_5, colorrange = jointlimits)
-    h = heatmap!(ax_fh, fh[1:end-1, :], colormap=:BrBG_5, colorrange = jointlimits)
+    jointlimits = (-0.8,0.8)
+    h1 = heatmap!(ax_cl, cl_no_t[1:end-1, :], colormap=:BrBG_5, colorrange = jointlimits)
+    h2 = heatmap!(ax_cl, cl_t[1:end-1, :], colormap= cgrad(:RdBu, rev=true) , colorrange = jointlimits)
+    vlines!(ax_cl, [4.5, 9.5], linestyle = :dash, color=:black)
+
+    heatmap!(ax_ch, ch_no_t[1:end-1, :], colormap=:BrBG_5, colorrange = jointlimits)
+    heatmap!(ax_ch, ch_t[1:end-1, :], colormap=cgrad(:RdBu, rev=true), colorrange = jointlimits)
+    vlines!(ax_ch, [4.5, 9.5], linestyle = :dash, color=:black)
+
+    heatmap!(ax_fl, fl_no_t[1:end-1, :], colormap=:BrBG_5, colorrange = jointlimits)
+    heatmap!(ax_fl, fl_t[1:end-1, :], colormap=cgrad(:RdBu, rev=true), colorrange = jointlimits)
+    vlines!(ax_fl, [4.5, 9.5], linestyle = :dash, color=:black)
+    
+    
+    heatmap!(ax_fh, fh_no_t[1:end-1, :], colormap=:BrBG_5, colorrange = jointlimits)
+    heatmap!(ax_fh, fh_t[1:end-1, :], colormap=cgrad(:RdBu, rev=true), colorrange = jointlimits)
+    vlines!(ax_fh, [4.5, 9.5], linestyle = :dash, color=:black)
 
     function plot_text(ax, data)
         for x=1:size(data)[1]
@@ -163,7 +194,7 @@ with_theme(theme_latexfonts()) do
                 position = [Point2f(x,y)], 
                 align=(:center, :center),
                 fontsize=14,
-                color = ifelse(abs(data[x,y]) < 1.0, :grey20, :white),
+                color = ifelse(abs(data[x,y]) < 0.5, :grey20, :white),
                 )
             end
         end
@@ -174,7 +205,8 @@ with_theme(theme_latexfonts()) do
     plot_text(ax_fl, fl[1:end-1, :])
     plot_text(ax_fh, fh[1:end-1, :])
 
-    Colorbar(f[1:2,3], h)
+    Colorbar(f[1,3], h2)
+    Colorbar(f[2,3], h1)
 
 
     left_pad = 10
@@ -220,7 +252,7 @@ with_theme(theme_latexfonts()) do
     )
     f
     save("images/anomaly_v3.pdf", f)
-    
+    f
 end
 
 
