@@ -135,3 +135,25 @@ ipcc_acronym = Dict(
  "W.Siberia" => "WSB",
  "West&Central-Europe" => "WCE",
 )
+
+ipcc_acronym_full = Dict(
+ "Central North-America" => "CNA",
+ "East Asia" => "EAS",
+ "Eastern Central Asia" => "ECA",
+ "Eastern Europe" => "EEU",
+ "Eastern North-America" => "ENA",
+ "Eastern Siberia" => "ESB",
+ "Mediterranean" => "MED",
+ "North Central-America" => "NCA",
+ "Northeastern North-America" => "NEN",
+ "Northern Europe" => "NEU",
+ "Northwestern North-America" => "NWN",
+ "Russian Arctic" => "RAR",
+ "Russian Far East" => "RFE",
+ "South Asia" => "SAS",
+ "Tibetan Plateau" => "TIB",
+ "Western Central Asia" => "WCA",
+ "Western North America" => "WNA",
+ "Western Siberia" => "WSB",
+ "West & Central Europe" => "WCE",
+)

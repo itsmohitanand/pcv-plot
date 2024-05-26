@@ -48,7 +48,7 @@ function coefficient_boxplot(ax, vegetation_type, xtreme)
                     
                 end
                 
-                scatter!(ax, log_reg[!, col_name][4], log_reg[!, col_name][5], color =color, marker=marker, markersize = 20)
+                scatter!(ax, exp(log_reg[!, col_name][4]), exp(log_reg[!, col_name][5]), color =color, marker=marker, markersize = 20)
 
                 if sig
                     
@@ -67,7 +67,7 @@ function coefficient_boxplot(ax, vegetation_type, xtreme)
                         
                     end
                     
-                    text!(ax, Point2f(log_reg[!, col_name][4], log_reg[!, col_name][5]) - shift, text=ipcc_acronym[regions])
+                    text!(ax, Point2f(exp(log_reg[!, col_name][4]), exp(log_reg[!, col_name][5])) - shift, text=ipcc_acronym[regions])
                     hidespines!(ax, :r, :t)
                 end
                 
@@ -76,15 +76,15 @@ function coefficient_boxplot(ax, vegetation_type, xtreme)
 
     end
 
-    hlines!(ax, 0, color = palette["light_blue"], linestyle = :dash)
-    vlines!(ax, 0, color = palette["light_blue"], linestyle = :dash)
+    hlines!(ax, 1, color = palette["light_blue"], linestyle = :dash)
+    vlines!(ax, 1, color = palette["light_blue"], linestyle = :dash)
 end
 
 with_theme(theme_latexfonts()) do
 
     f = Figure(resolution=(1200, 600), fontsize = 18)
-    ax1 = Axis(f[2,1], xgridvisible = false, ygridvisible = false,  xlabel=L"Winter temperature coefficient ($\alpha_5$)", ylabel=L"Winter precipitaiton coefficient ($\alpha_6$)", title = L"LAI_{low}", titlegap = 20)
-    ax2 = Axis(f[2,2], xgridvisible = false, ygridvisible = false, xlabel=L"Winter temperature coefficient ($\alpha_5$)", title = L"LAI_{high}", titlegap=20)
+    ax1 = Axis(f[2,1], xgridvisible = false, ygridvisible = false,  xlabel=L"Odds ratio of $T_w$ $(e^{\alpha_5})$", ylabel=L"Odds ratio of $P_w$  $(e^{\alpha_6})$", title = L"LAI_{low}", titlegap = 20)
+    ax2 = Axis(f[2,2], xgridvisible = false, ygridvisible = false, xlabel=L"Odds ratio of $T_w$ $(e^{\alpha_5})$", title = L"LAI_{high}", titlegap=20)
     # ax3 = Axis(f[3,1], xgridvisible = false, ygridvisible = false, xlabel="Winter temperature coefficient", ylabel="Winter precipitaiton coefficient",  title = "Low LAI (Forest)")
     # ax4 = Axis(f[3,2], xgridvisible = false, ygridvisible = false, xlabel="Winter temperature coefficient",  title = "High LAI (Forest)")
 

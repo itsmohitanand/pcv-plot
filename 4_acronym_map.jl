@@ -147,9 +147,9 @@ with_theme(theme_latexfonts()) do
     plot_significance(ax3, table, "forest", "low")
 
 
-    x=0
+    x=-0.1
     y=0
-    for (i, (k, v)) in enumerate(sort(collect(ipcc_acronym), by=x->x[1]))
+    for (i, (k, v)) in enumerate(sort(collect(ipcc_acronym_full), by=x->x[1]))
         
         k = replace(k, "." =>". ")
         k = replace(k, "&"=>" & ")
@@ -157,7 +157,7 @@ with_theme(theme_latexfonts()) do
         text!(ax1, x,y, text = "$k ($v)")
         
         if i%4==0
-            x=0
+            x=-0.1
             y-=1
         else
             x+=1
@@ -167,7 +167,7 @@ with_theme(theme_latexfonts()) do
         # text!(ax1, c,-r, text = v)
     
     end
-    xlims!(ax1, -0.1,3.70)
+    xlims!(ax1, -0.1,3.80)
     ylims!(ax1, -4, 1)
 
     hidespines!(ax1)
@@ -261,5 +261,3 @@ with_theme(theme_latexfonts()) do
     f
 end
 
-
-f

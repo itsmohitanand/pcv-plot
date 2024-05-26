@@ -17,7 +17,7 @@ ipcc_acronym
 
 palette
 
-vegetation_type = "forest"
+vegetation_type = "crop"
 xtreme = "high"
 
 log_reg = read_log_df(vegetation_type, xtreme)
@@ -26,7 +26,7 @@ for (i, regions) in enumerate(region_list)
     if col_name in names(log_reg)
         if (log_reg[!, col_name][3]>100*38)
             print(col_name*"\n")
-            print(string(log_reg[!, col_name][4:end])*"\n")
+            print(string(round.(exp.(log_reg[!, col_name][4:end]), digits=3))*"\n")
         end
     end
 end
