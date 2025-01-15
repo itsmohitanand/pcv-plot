@@ -136,7 +136,7 @@ with_theme(theme_latexfonts()) do
 
     r_val = 1
 
-    ax1 = Axis(f[4,r_val], title = "IPCC region and Acronym")
+    ax1 = Axis(f[4,r_val], title = "IPCC regions with acronyms")
     # ax1 = GeoAxis(f[1:2,l_val], latlims=(25,75), dest = "+proj=eqearth", coastlines = true, xgridvisible = false, ygridvisible=false, xticklabelsvisible=false, yticklabelsvisible=false, yticks=[25,50,75], xticks=[-90,0,90], xticklabelpad=20, titlegap=20, coastline_attributes= (color=:grey40, linewidth=1.0,) )
 
     ax2 = GeoAxis(f[2,r_val], latlims=(25,75), dest = "+proj=eqearth", coastlines = true, xgridvisible = false, ygridvisible=false, xticklabelsvisible=false, yticklabelsvisible=false, yticks=[25,50,75], xticks=[-90,0,90], xticklabelpad=20 , titlegap=20, coastline_attributes= (color=:grey40, linewidth=1.0,)   )

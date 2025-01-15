@@ -71,7 +71,7 @@ end
 
 
 function winter_significance(df, df_w)
-    diff = max(mean(df_w[!,"AUC"]) - quantile(df[!,"AUC"], 0.95),0)
+    diff = mean(df_w[!,"AUC"]) - quantile(df[!,"AUC"], 0.95)
 
     return diff>0
 end
@@ -139,7 +139,7 @@ ipcc_acronym = Dict(
 ipcc_acronym_full = Dict(
  "Central North-America" => "CNA",
  "East Asia" => "EAS",
- "Eastern Central Asia" => "ECA",
+ "Eastern Central-Asia" => "ECA",
  "Eastern Europe" => "EEU",
  "Eastern North-America" => "ENA",
  "Eastern Siberia" => "ESB",
@@ -152,8 +152,8 @@ ipcc_acronym_full = Dict(
  "Russian Far East" => "RFE",
  "South Asia" => "SAS",
  "Tibetan Plateau" => "TIB",
- "Western Central Asia" => "WCA",
- "Western North America" => "WNA",
+ "Western Central-Asia" => "WCA",
+ "Western North-America" => "WNA",
  "Western Siberia" => "WSB",
  "West & Central Europe" => "WCE",
 )

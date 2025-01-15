@@ -170,20 +170,19 @@ with_theme(theme_latexfonts()) do
 
     jointlimits = (-0.8,0.8)
     h1 = heatmap!(ax_cl, cl_no_t[1:end-1, :], colormap=:BrBG_5, colorrange = jointlimits)
-    h2 = heatmap!(ax_cl, cl_t[1:end-1, :], colormap= cgrad(:RdBu, rev=true) , colorrange = jointlimits)
+    h2 = heatmap!(ax_cl, cl_t[1:end-1, :], colormap= cgrad(:RdBu_9, rev=true) , colorrange = jointlimits)
     vlines!(ax_cl, [4.5, 9.5], linestyle = :dash, color=:black)
 
     heatmap!(ax_ch, ch_no_t[1:end-1, :], colormap=:BrBG_5, colorrange = jointlimits)
-    heatmap!(ax_ch, ch_t[1:end-1, :], colormap=cgrad(:RdBu, rev=true), colorrange = jointlimits)
+    heatmap!(ax_ch, ch_t[1:end-1, :], colormap=cgrad(:RdBu_9, rev=true), colorrange = jointlimits)
     vlines!(ax_ch, [4.5, 9.5], linestyle = :dash, color=:black)
 
     heatmap!(ax_fl, fl_no_t[1:end-1, :], colormap=:BrBG_5, colorrange = jointlimits)
-    heatmap!(ax_fl, fl_t[1:end-1, :], colormap=cgrad(:RdBu, rev=true), colorrange = jointlimits)
+    heatmap!(ax_fl, fl_t[1:end-1, :], colormap=cgrad(:RdBu_9, rev=true), colorrange = jointlimits)
     vlines!(ax_fl, [4.5, 9.5], linestyle = :dash, color=:black)
     
-    
     heatmap!(ax_fh, fh_no_t[1:end-1, :], colormap=:BrBG_5, colorrange = jointlimits)
-    heatmap!(ax_fh, fh_t[1:end-1, :], colormap=cgrad(:RdBu, rev=true), colorrange = jointlimits)
+    heatmap!(ax_fh, fh_t[1:end-1, :], colormap=cgrad(:RdBu_9, rev=true), colorrange = jointlimits)
     vlines!(ax_fh, [4.5, 9.5], linestyle = :dash, color=:black)
 
     function plot_text(ax, data)

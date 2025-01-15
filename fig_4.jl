@@ -83,10 +83,11 @@ regions_acronym = [ipcc_acronym[region] for region in regions]
 
 with_theme(theme_latexfonts()) do
 
-    f = Figure(resolution=(1200, 1400), fontsize=18)
+    f = Figure(resolution=(1200, 1400), fontsize=17)
 
-    ax1 = Axis(f[2,1], title = L"LAI_{low}", xgridvisible = false, ygridvisible=false, yticks= (1:1:19*1, regions_acronym))
-    ax2 = Axis(f[2,2], title = L"LAI_{high}", xgridvisible = false, ygridvisible=false)
+    ax1 = Axis(f[2:6,1], title = L"LAI_{low}", xgridvisible = false, ygridvisible=false, yticks= (1:1:19*1, regions_acronym))
+    ax2 = Axis(f[2:6,2], title = L"LAI_{high}", xgridvisible = false, ygridvisible=false)
+    ax3 = Axis(f[7,1:2], title = "IPCC regions with acronyms")
     # ax3 = Axis(f[2,1], title = "High crop activity", xgridvisible = false, ygridvisible=false, yticks= (1:1:19*1, regions))
     # ax4 = Axis(f[2,2], title = "High forest activity", xgridvisible = false, ygridvisible=false)
 
@@ -114,8 +115,35 @@ with_theme(theme_latexfonts()) do
     elem_2 = MarkerElement(color = palette["mint"], marker = :rect, markersize = 15, points=Point2f[(0.5,0.5)])
 
     Legend(f[1,1:end], [elem_1, elem_2], ["Crop", "Forest"], orientation= :horizontal, framevisible=false)
+    
+    x=-0.1
+    y=0
+    for (i, (k, v)) in enumerate(sort(collect(ipcc_acronym_full), by=x->x[1]))
+        
+        k = replace(k, "." =>". ")
+        k = replace(k, "&"=>" & ")
+
+        text!(ax3, x,y, text = "$k ($v)")
+        
+        if i%4==0
+            x=-0.1
+            y-=1
+        else
+            x+=1
+        end
+
+        # text!(ax1, c,-r, text = v)
+    
+    end
+
+
+    xlims!(ax3, -0.1,3.80)
+    ylims!(ax3, -4, 1)
+
+    hidespines!(ax3)
+    hidedecorations!(ax3)
     f
-    save("images/year_of_extreme_v3.pdf", f)
+    save("images/year_of_extreme_v4.pdf", f)
 
 end
 

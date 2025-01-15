@@ -153,7 +153,7 @@ function rank_auc_diff(f, ax_loc, df, color, title )
     xticklabelrotation = π/2, 
     xgridvisible=false, ygridvisible=false, ylabel="Preconditioning Strength")
 
-    
+    print(diff)
     for (i , sort_index) in enumerate(sorted_index)
         if diff[sort_index] < 0.02
             color = (:grey80, 0.8)
@@ -161,8 +161,10 @@ function rank_auc_diff(f, ax_loc, df, color, title )
         barplot!(ax, x[i], diff[sort_index], color = color)
     end
     hlines!(ax, 0.02, linestyle=:dash, color=:black)
+    hlines!(ax, 0, color=:grey20)
+
     hidespines!(ax, :r, :t)
-    ylims!(ax, low=0)
+    # ylims!(ax, low=-0.05)
 
 end
 
@@ -283,7 +285,7 @@ with_theme(theme_latexfonts()) do
         font = "TeX Gyre Heros Makie Bold"
     )
     f
-    save("images/significance_plot_v3.pdf",f) 
+    save("images/significance_plot_v4.pdf",f) 
 
 end
 
